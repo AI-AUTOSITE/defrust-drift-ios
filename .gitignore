@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+*.xcresult
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# fastlane (Week 2+)
+fastlane/report.xml
+fastlane/test_output/
+
+# Secrets — NEVER commit signing keys or API keys
+*.p8
+AuthKey_*.p8
+*.mobileprovision
+.env

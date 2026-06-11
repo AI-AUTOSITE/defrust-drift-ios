@@ -1,0 +1,83 @@
+name: CI
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Build & Test
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Pick the newest Xcode 26.x on the runner (falls back to default if absent)
+      - name: Select Xcode 26
+        run: |
+          XCODE_PATH=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$XCODE_PATH" ]; then
+            sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          fi
+          xcodebuild -version
+
+      - name: Cache SwiftPM
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages/checkouts
+          key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            spm-${{ runner.os }}-
+
+      - name: Cache DerivedData
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: dd-${{ runner.os }}-${{ hashFiles('**/*.swift') }}
+          restore-keys: |
+            dd-${{ runner.os }}-
+
+      - name: Resolve packages
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project Drift.xcodeproj \
+            -scheme Drift
+
+      - name: Install SwiftLint & xcbeautify
+        run: brew install swiftlint xcbeautify
+
+      - name: SwiftLint
+        run: swiftlint --strict --reporter github-actions-logging
+
+      # DefrustKit is vendored later; guard so Day 1 passes before it exists
+      - name: Verify zero third-party production deps
+        run: |
+          if [ -f DefrustKit/Package.swift ] && grep -q 'package(url:' DefrustKit/Package.swift; then
+            echo "::error::DefrustKit must have no third-party prod deps"
+            exit 1
+          fi
+
+      - name: Run Unit Tests (Swift Testing)
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project Drift.xcodeproj \
+            -scheme Drift \
+            -testPlan DriftUnit \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -resultBundlePath build/TestResults.xcresult \
+            -enableCodeCoverage YES \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify --renderer github-actions
+
+      - name: Upload xcresult on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcresult
+          path: build/TestResults.xcresult

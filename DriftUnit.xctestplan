@@ -1,0 +1,32 @@
+{
+  "configurations" : [
+    {
+      "id" : "3CB0BBA7-033E-44BA-833B-79ECE25896C7",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    },
+    {
+      "enabled" : false,
+      "id" : "49A7CE1E-2B79-4DD1-AA40-8B6E1A0D1A49",
+      "name" : "Configuration 2",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Drift.xcodeproj",
+        "identifier" : "3EE2BC372FDA7C53002C7CEF",
+        "name" : "DriftTests"
+      }
+    }
+  ],
+  "version" : 1
+}

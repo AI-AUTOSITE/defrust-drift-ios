@@ -1,0 +1,47 @@
+# .swiftlint.yml
+included:
+  - Drift
+  - DefrustKit/Sources
+excluded:
+  - DefrustKit/Tests
+  - DriftTests
+  - DriftUITests
+  - .build
+  - DerivedData
+
+disabled_rules:
+  - trailing_whitespace
+  - identifier_name        # Drift uses 'id', 'vm', 'gw' freely
+  - line_length            # let Xcode wrap; SwiftUI lines are long
+
+opt_in_rules:
+  - empty_count
+  - explicit_init
+  - force_unwrapping
+  - sorted_imports
+  - first_where
+  - last_where
+  - prefer_self_in_static_references
+  - redundant_nil_coalescing
+  - toggle_bool
+  - unused_optional_binding
+
+line_length:
+  warning: 140
+  error: 200
+
+type_body_length:
+  warning: 400
+  error: 600
+
+file_length:
+  warning: 600
+  error: 1000
+
+cyclomatic_complexity:
+  warning: 12
+
+force_cast: warning
+force_try: warning
+force_unwrapping:
+  severity: warning
