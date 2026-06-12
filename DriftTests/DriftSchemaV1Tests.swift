@@ -3,6 +3,11 @@ import SwiftData
 import Testing
 @testable import Drift
 
+// `Category` also exists in a system framework, so the unqualified name is
+// ambiguous inside the test module (the app module wins via its own typealias).
+// This local alias pins it to Drift's model.
+private typealias Category = DriftSchemaV1.Category
+
 @Suite("DriftSchemaV1 (in-memory)")
 @MainActor
 struct DriftSchemaV1Tests {

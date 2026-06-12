@@ -33,18 +33,32 @@ extension DriftSchemaV1 {
 
 // MARK: - Default categories (seeded on first launch)
 
+/// Lightweight seeding value. A struct instead of a tuple keeps
+/// SwiftLint's large_tuple rule satisfied (tuples max out at 2 members).
+private struct CategoryPreset: Sendable {
+    let name: String
+    let color: String
+    let symbol: String
+
+    init(_ name: String, _ color: String, _ symbol: String) {
+        self.name = name
+        self.color = color
+        self.symbol = symbol
+    }
+}
+
 extension Category {
-    static let defaultPresets: [(name: String, color: String, symbol: String)] = [
-        ("Streaming", "#FF453A", "play.tv.fill"),
-        ("SaaS", "#5E5CE6", "briefcase.fill"),
-        ("News", "#FF9F0A", "newspaper.fill"),
-        ("Fitness", "#30D158", "figure.run"),
-        ("AI", "#BF5AF2", "brain.head.profile"),
-        ("Productivity", "#0A84FF", "checkmark.square.fill"),
-        ("Music", "#FF2D92", "music.note"),
-        ("Gaming", "#64D2FF", "gamecontroller.fill"),
-        ("E-commerce", "#FFD60A", "cart.fill"),
-        ("Other", "#8E8E93", "ellipsis.circle.fill")
+    private static let defaultPresets: [CategoryPreset] = [
+        CategoryPreset("Streaming", "#FF453A", "play.tv.fill"),
+        CategoryPreset("SaaS", "#5E5CE6", "briefcase.fill"),
+        CategoryPreset("News", "#FF9F0A", "newspaper.fill"),
+        CategoryPreset("Fitness", "#30D158", "figure.run"),
+        CategoryPreset("AI", "#BF5AF2", "brain.head.profile"),
+        CategoryPreset("Productivity", "#0A84FF", "checkmark.square.fill"),
+        CategoryPreset("Music", "#FF2D92", "music.note"),
+        CategoryPreset("Gaming", "#64D2FF", "gamecontroller.fill"),
+        CategoryPreset("E-commerce", "#FFD60A", "cart.fill"),
+        CategoryPreset("Other", "#8E8E93", "ellipsis.circle.fill")
     ]
 
     /// Seeds the ten default categories exactly once. Safe to call on every launch.
