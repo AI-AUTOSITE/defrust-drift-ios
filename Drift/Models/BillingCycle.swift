@@ -12,7 +12,7 @@ enum BillingCycle: String, Codable, CaseIterable, Identifiable {
     case quarterly
     case yearly
     case custom
-
+    
     var id: String { rawValue }
 
     /// Number of months, as `Decimal` to avoid floating-point drift in currency math.
