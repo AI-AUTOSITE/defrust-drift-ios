@@ -32,7 +32,34 @@ struct ExchangeRates {
         return inUSD * toRate
     }
 
+    // MARK: - Aggregation & display helpers (Part 1B §9.4 / §11.2)
+    //
+    // Money is kept in `Decimal` everywhere it is stored or summed. The two `Double`
+    // bridges below exist only at the chart / Foundation Models boundary, where the
+    // APIs (`SectorMark`, `BarMark`, `@Generable`) require `Double`. `format` stays in
+    // `Decimal` end to end, so notification bodies never lose a cent to Double rounding.
+
+    /// USD value of `amount` (given in `code`), as a `Double` for charts and the AI
+    /// review snapshot. Unknown currencies pass through at face value (see `convert`).
+    static func toUSD(_ amount: Decimal, code: String) -> Double {
+        let usd = convert(amount, from: code, to: "USD")
+        return NSDecimalNumber(decimal: usd).doubleValue
+    }
+
+    /// Inverse of `toUSD`: turn a USD `Double` back into a `Decimal` amount in `code`,
+    /// for display in the user's preferred currency.
+    static func fromUSD(_ usd: Double, code: String) -> Decimal {
+        convert(Decimal(usd), from: "USD", to: code)
+    }
+
+    /// Localized currency string for display (notification bodies, labels). Formats
+    /// `amount` in its own `currencyCode` with no conversion — `Decimal` in, `String`
+    /// out, so the value shown is exact.
+    static func format(_ amount: Decimal, currencyCode: String) -> String {
+        amount.formatted(.currency(code: currencyCode))
+    }
+
     // NOTE(Day 3-4): `totalMonthlyCost(subscriptions:preferredCurrency:)` from
-    // Part 1A §6.4 is added once the `Subscription` SwiftData model exists
-    // (drift-part-1a-core-schema.md §2.4). Day 1 stays free of SwiftData.
+    // Part 1A §6.4 is deferred — the Overview view model (Part 1B §11.2) sums via
+    // `toUSD` / `fromUSD` inline, so no dedicated aggregate is needed yet.
 }
