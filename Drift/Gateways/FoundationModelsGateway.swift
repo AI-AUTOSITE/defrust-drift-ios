@@ -95,8 +95,8 @@ nonisolated enum DriftAIError: Error, Sendable, Equatable {
 /// wired in when `OnDeviceFoundationModelsGateway` lands (on-device phase, iOS 26+).
 enum GatewayFactory {
     nonisolated static func makeGateway() -> any FoundationModelsGateway {
-        // TODO(on-device phase): once OnDeviceFoundationModelsGateway exists, return
-        // it behind `if #available(iOS 26.0, *), ModelAvailabilityProbe.current() == .ready`.
+        // On-device phase: once OnDeviceFoundationModelsGateway exists, return it here
+        // behind `if #available(iOS 26.0, *), ModelAvailabilityProbe.current() == .ready`.
         RuleBasedFallbackGateway()
     }
 }
