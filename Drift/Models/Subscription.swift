@@ -5,6 +5,11 @@ extension DriftSchemaV1 {
     @Model
     final class Subscription {
         // MARK: - Identity & Display
+        /// Stable per-record identifier. Used for notification request IDs
+        /// (`renewal-<uuid>-<daysBefore>`), the AppIntents `SubscriptionEntity`,
+        /// and `drift://subscription/<uuid>` deep links. Not `.unique` — CloudKit
+        /// does not support unique constraints — matching the other models.
+        var id: UUID = UUID()
         var name: String = ""
         /// Joins to a CancellationGuide entry (Part 1C), e.g. "netflix".
         /// The special value "apple-subscription" routes to showManageSubscriptions(in:).
@@ -70,6 +75,7 @@ extension DriftSchemaV1 {
             iconName: String = "creditcard.fill",
             customColor: String = "#5E5CE6"
         ) {
+            self.id = UUID()
             self.name = name
             self.monthlyCost = monthlyCost
             self.currencyCode = currencyCode
