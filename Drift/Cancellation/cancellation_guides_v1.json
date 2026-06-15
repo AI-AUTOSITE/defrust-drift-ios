@@ -1,0 +1,963 @@
+[
+  {
+    "id": "netflix",
+    "serviceName": "Netflix",
+    "category": "Streaming",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.netflix.com/cancelplan",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open the Netflix cancel page in your browser and sign in.","supportingNote":"Direct link bypasses the account menu."},
+      {"order":2,"action":"Tap 'Finish Cancellation' on the membership page.","supportingNote":"Netflix does not run multi-step retention offers."},
+      {"order":3,"action":"Confirm the cancellation date shown on screen.","supportingNote":"You keep access until the period end."},
+      {"order":4,"action":"Check your email for the cancellation confirmation.","supportingNote":"Keep this for your records."}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 2,
+    "warningNote": null,
+    "notes": "Profiles and viewing history are retained for 10 months in case you restart."
+  },
+  {
+    "id": "disney-plus",
+    "serviceName": "Disney+",
+    "category": "Streaming",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.disneyplus.com/account/subscription",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open the Disney+ account subscription page and sign in.","supportingNote":null},
+      {"order":2,"action":"Select your active Disney+ plan.","supportingNote":"If you have the Disney Bundle, this also covers Hulu/ESPN+."},
+      {"order":3,"action":"Tap 'Cancel Subscription' and choose 'Continue to Cancel'.","supportingNote":"Disney+ will offer a $2.99 first-month bundle promo; tap through if you don't want it."},
+      {"order":4,"action":"Select a reason and confirm.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": "Cancelling the Disney Bundle also cancels Hulu and ESPN+. If you want to keep one, cancel the bundle and re-subscribe to the standalone service afterwards.",
+    "notes": null
+  },
+  {
+    "id": "hulu",
+    "serviceName": "Hulu",
+    "category": "Streaming",
+    "regionAvailability": ["US"],
+    "primaryCancelURL": "https://www.hulu.com/account/cancel",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Go to the Hulu cancellation URL and sign in.","supportingNote":null},
+      {"order":2,"action":"Decline the 'Pause your subscription for up to 12 weeks' offer.","supportingNote":"Pause is useful if you really want a break, but it auto-resumes."},
+      {"order":3,"action":"Decline the Disney+/ESPN+ bundle upsell.","supportingNote":"Hulu typically offers a discounted Disney Bundle at this step."},
+      {"order":4,"action":"Decline any additional retention discount (often $2.99/mo for 3 months).","supportingNote":"You can accept this if you want to keep Hulu cheaper; otherwise continue."},
+      {"order":5,"action":"Tap 'Cancel Subscription' on the final screen and confirm.","supportingNote":"You should receive a confirmation email."}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 5,
+    "warningNote": "Multi-stage retention: pause (up to 12 weeks) → bundle upsell → retention discount. No prorated refunds; access continues to end of cycle.",
+    "notes": "If billed through a third party (Roku, Amazon, Apple), cancel there instead."
+  },
+  {
+    "id": "max",
+    "serviceName": "Max",
+    "category": "Streaming",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://auth.hbomax.com/cancel-subscription",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open the Max cancel URL and sign in.","supportingNote":null},
+      {"order":2,"action":"Navigate to Subscription → Manage Subscription.","supportingNote":null},
+      {"order":3,"action":"Confirm where Max bills you — if it says 'billed through Amazon/Apple/Roku', cancel there.","supportingNote":"Direct subscribers continue on Max.com."},
+      {"order":4,"action":"Tap 'Cancel Subscription' and decline the retention discount (50% off for 3-6 months is common).","supportingNote":null},
+      {"order":5,"action":"Confirm cancellation and save the confirmation email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 4,
+    "warningNote": "If Max came via a bundle (e.g. Cricket Wireless, AT&T), cancellation must happen at the origin provider, not Max.com.",
+    "notes": null
+  },
+  {
+    "id": "apple-tv-plus",
+    "serviceName": "Apple TV+",
+    "category": "Streaming",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": null,
+    "appleBilledOption": true,
+    "steps": [
+      {"order":1,"action":"Open Settings on your iPhone or iPad and tap your Apple ID.","supportingNote":null},
+      {"order":2,"action":"Tap 'Subscriptions' and select Apple TV+.","supportingNote":null},
+      {"order":3,"action":"Tap 'Cancel Subscription' and confirm.","supportingNote":"You retain access until the period end."}
+    ],
+    "estimatedTimeMinutes": 2,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 1,
+    "warningNote": null,
+    "notes": "Apple often offers 3 free months on cancel attempt — accept only if you actually want to keep watching."
+  },
+  {
+    "id": "amazon-prime-video",
+    "serviceName": "Amazon Prime Video",
+    "category": "Streaming",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.primevideo.com/account",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Visit primevideo.com/account and sign in.","supportingNote":null},
+      {"order":2,"action":"Select 'Manage Subscription' under Prime Video Channels or your Prime Video plan.","supportingNote":"If you only have Prime Video via full Amazon Prime, use the Amazon Prime guide instead."},
+      {"order":3,"action":"Tap 'Cancel Channel' or 'End Subscription' next to the plan.","supportingNote":null},
+      {"order":4,"action":"Decline retention offers (often 30 days free, then a discount).","supportingNote":"This is the same 'Iliad Flow' family of UI Amazon used for Prime cancellation."},
+      {"order":5,"action":"Confirm on the final screen and save the email confirmation.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 10,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 8,
+    "warningNote": "Amazon's cancellation UX is the same family criticised in the FTC's Prime case (settled for $2.5 billion on Sept 25, 2025; $1B civil penalty + $1.5B consumer redress to an estimated 35 million customers). Expect multiple confirm screens.",
+    "notes": null
+  },
+  {
+    "id": "paramount-plus",
+    "serviceName": "Paramount+",
+    "category": "Streaming",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.paramountplus.com/account/",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open the Paramount+ account page and sign in.","supportingNote":null},
+      {"order":2,"action":"Tap 'Subscription & Billing' → 'Cancel Subscription'.","supportingNote":null},
+      {"order":3,"action":"Decline the retention offer (commonly a discounted month).","supportingNote":null},
+      {"order":4,"action":"Select a reason and confirm cancellation.","supportingNote":"Access continues until the end of the current period."}
+    ],
+    "estimatedTimeMinutes": 4,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": null,
+    "notes": "If bundled via Walmart+, you cancel the bundle on walmart.com (separate flow)."
+  },
+  {
+    "id": "peacock",
+    "serviceName": "Peacock",
+    "category": "Streaming",
+    "regionAvailability": ["US","UK"],
+    "primaryCancelURL": "https://www.peacocktv.com/account/plans-payment",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Visit the Peacock Plans & Payment page and sign in.","supportingNote":null},
+      {"order":2,"action":"Click 'Change or Cancel Plan' → 'Cancel Plan'.","supportingNote":null},
+      {"order":3,"action":"Decline the deep retention offer (Peacock often offers up to 73% off for 6 months).","supportingNote":"If you want to keep it cheaply, this is a legitimate discount."},
+      {"order":4,"action":"Confirm cancellation; save the email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 2,
+    "warningNote": null,
+    "notes": null
+  },
+  {
+    "id": "crunchyroll",
+    "serviceName": "Crunchyroll",
+    "category": "Streaming",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.crunchyroll.com/account/membership",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Sign in at crunchyroll.com and open the Membership page.","supportingNote":null},
+      {"order":2,"action":"Tap 'Cancel Membership' on your active plan.","supportingNote":null},
+      {"order":3,"action":"Decline retention offer (often a free month or downgrade to a cheaper tier).","supportingNote":null},
+      {"order":4,"action":"Select a reason and confirm.","supportingNote":null},
+      {"order":5,"action":"Check email for confirmation.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 4,
+    "warningNote": null,
+    "notes": "If billed via iTunes/Google Play, cancel there. The Crunchyroll site cannot cancel store-billed subscriptions."
+  },
+  {
+    "id": "britbox",
+    "serviceName": "BritBox",
+    "category": "Streaming",
+    "regionAvailability": ["UK","US","CA","AU"],
+    "primaryCancelURL": "https://www.britbox.com/account/cancel-subscription",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open britbox.com in a web browser (the mobile app and smart-TV apps cannot cancel).","supportingNote":"You must use a desktop or mobile browser."},
+      {"order":2,"action":"Sign in and go to 'My Account' → 'Cancel Subscription'.","supportingNote":null},
+      {"order":3,"action":"Confirm cancellation and save the confirmation email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 5,
+    "warningNote": "BritBox does NOT support cancellation from the iOS or smart-TV app. You must use a browser. No prorated refunds are issued for unused portions of the billing period.",
+    "notes": "If you subscribed via Amazon Prime Video Channels, Roku or Apple, cancel at the source platform."
+  },
+  {
+    "id": "stan",
+    "serviceName": "Stan",
+    "category": "Streaming",
+    "regionAvailability": ["AU"],
+    "primaryCancelURL": "https://www.stan.com.au/manage/account",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open stan.com.au/manage/account and sign in.","supportingNote":null},
+      {"order":2,"action":"Tap 'Cancel Subscription'.","supportingNote":null},
+      {"order":3,"action":"Confirm cancellation; the screen will show your access-end date.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 2,
+    "warningNote": null,
+    "notes": "Stan is Australia-only. No prorated refunds, but cancellation is straightforward."
+  },
+  {
+    "id": "crave",
+    "serviceName": "Crave",
+    "category": "Streaming",
+    "regionAvailability": ["CA"],
+    "primaryCancelURL": "https://account.bellmedia.ca/account/subscriptions",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Sign in at account.bellmedia.ca and select Subscriptions.","supportingNote":null},
+      {"order":2,"action":"Choose your Crave plan and tap 'Cancel Subscription'.","supportingNote":null},
+      {"order":3,"action":"Decline retention offer and confirm.","supportingNote":null},
+      {"order":4,"action":"Save the confirmation email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 4,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": null,
+    "notes": "If Crave is bundled into your Bell TV/Internet plan, cancellation must go through Bell support, not the web portal."
+  },
+  {
+    "id": "spotify",
+    "serviceName": "Spotify",
+    "category": "Music",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.spotify.com/account/subscription/change/",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open Spotify's subscription change page and sign in.","supportingNote":null},
+      {"order":2,"action":"Scroll to 'Available plans' and choose 'Spotify Free' → 'Cancel Premium'.","supportingNote":null},
+      {"order":3,"action":"Confirm by entering your password if prompted.","supportingNote":null},
+      {"order":4,"action":"Save the confirmation; you keep Premium until period end.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 2,
+    "warningNote": null,
+    "notes": "For Family or Duo plans, only the plan manager can cancel. Members can leave individually via account settings."
+  },
+  {
+    "id": "apple-music",
+    "serviceName": "Apple Music",
+    "category": "Music",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": null,
+    "appleBilledOption": true,
+    "steps": [
+      {"order":1,"action":"Open Settings → [Your Name] → Subscriptions on your iPhone.","supportingNote":null},
+      {"order":2,"action":"Tap Apple Music and then 'Cancel Subscription'.","supportingNote":null},
+      {"order":3,"action":"Confirm.","supportingNote":"Your downloaded library becomes unplayable after the period end."}
+    ],
+    "estimatedTimeMinutes": 2,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 1,
+    "warningNote": null,
+    "notes": null
+  },
+  {
+    "id": "youtube-premium",
+    "serviceName": "YouTube Premium",
+    "category": "Music",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.youtube.com/paid_memberships",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open youtube.com/paid_memberships and sign in.","supportingNote":null},
+      {"order":2,"action":"Tap 'Manage membership' → 'Deactivate' → 'Cancel'.","supportingNote":null},
+      {"order":3,"action":"Choose a reason and confirm.","supportingNote":"You retain Premium until period end."}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 2,
+    "warningNote": null,
+    "notes": "If billed via Apple (subscribed in the iOS YouTube app), cancel through Apple Subscriptions instead."
+  },
+  {
+    "id": "audible",
+    "serviceName": "Audible",
+    "category": "Music",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.audible.com/account/cancel-membership",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"BEFORE cancelling: spend or download all your unused credits — they expire at the end of the final billing period.","supportingNote":"Per Audible help: any title bought with a credit is yours to keep forever, but unused credits are forfeited at the end of the final billing cycle (except App Store / Google Play subscribers, whose credits do not expire)."},
+      {"order":2,"action":"Open audible.com/account/cancel-membership in a browser (the iOS app does not allow cancellation).","supportingNote":null},
+      {"order":3,"action":"Decline the 3-month pause and the downgrade-to-Plus offers — UNLESS you want to keep credits via Audible Plus.","supportingNote":"Audible Plus retains accrued credits at a lower monthly price."},
+      {"order":4,"action":"Decline retention discounts.","supportingNote":null},
+      {"order":5,"action":"Tap 'Continue Cancel' and confirm on the final screen.","supportingNote":null},
+      {"order":6,"action":"Save the email confirmation.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 10,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 7,
+    "warningNote": "Unused credits are forfeited on cancellation (except App Store / Google Play subscribers). Spend them first. The Audible mobile app cannot cancel — browser only.",
+    "notes": null
+  },
+  {
+    "id": "siriusxm",
+    "serviceName": "SiriusXM",
+    "category": "Music",
+    "regionAvailability": ["US"],
+    "primaryCancelURL": "https://care.siriusxm.com",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Have your SiriusXM account number ready (find it on a recent invoice or in 'My Account').","supportingNote":null},
+      {"order":2,"action":"Open care.siriusxm.com and start the online chat ('Cancel Subscription' intent).","supportingNote":"Chat is generally faster than phone (1-866-635-2349)."},
+      {"order":3,"action":"State plainly: 'I want to cancel my subscription, please do not transfer me to retention.'","supportingNote":"You will still be routed to retention; this just signals the agent."},
+      {"order":4,"action":"Decline each retention offer politely — there are typically 4 to 6.","supportingNote":"The NY AG investigation documented an agent script with up to 5 retention offers and a 6-part conversation."},
+      {"order":5,"action":"Get the cancellation confirmation number in writing in the chat transcript.","supportingNote":"Take a screenshot."},
+      {"order":6,"action":"Verify on your next statement that no further charges appear.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 15,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 9,
+    "warningNote": "On November 21, 2024, New York Supreme Court Justice Lyle Frank ruled in People of the State of New York v. Sirius XM Radio Inc. (Index No. 453325/2023) that SiriusXM violated the federal Restore Online Shoppers' Confidence Act (ROSCA). Frank wrote: 'their cancellation procedure is clearly not as easy to use as the initiation method.' New York subscribers can now self-serve online; outside NY the flow may still require a live agent. Be patient and assertive.",
+    "notes": null
+  },
+  {
+    "id": "icloud-plus",
+    "serviceName": "iCloud+",
+    "category": "Family",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": null,
+    "appleBilledOption": true,
+    "steps": [
+      {"order":1,"action":"BEFORE downgrading: delete/export files so your iCloud usage fits within the free 5GB tier.","supportingNote":"Otherwise, new backups, Photos sync, and iCloud Drive will stop."},
+      {"order":2,"action":"Open Settings → [Your Name] → iCloud → Manage Account Storage → Change Storage Plan.","supportingNote":null},
+      {"order":3,"action":"Tap 'Downgrade Options', authenticate, and choose 'Free 5 GB'.","supportingNote":null},
+      {"order":4,"action":"Confirm; the downgrade takes effect at the end of the current cycle.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 2,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 1,
+    "warningNote": "If your iCloud data exceeds 5 GB at downgrade time, photos and backups stop syncing immediately at period end. Organize data first.",
+    "notes": null
+  },
+  {
+    "id": "google-one",
+    "serviceName": "Google One",
+    "category": "Family",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://one.google.com/",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open one.google.com and sign in.","supportingNote":null},
+      {"order":2,"action":"Go to 'Settings' → 'Cancel Membership'.","supportingNote":null},
+      {"order":3,"action":"Read the storage warning (your Google Photos/Drive content over 15 GB will become read-only).","supportingNote":null},
+      {"order":4,"action":"Confirm cancellation.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 2,
+    "warningNote": null,
+    "notes": "If billed via Apple, cancel through Subscriptions on iOS instead. Family-shared storage drops to the 15 GB tier on cancellation."
+  },
+  {
+    "id": "apple-one",
+    "serviceName": "Apple One",
+    "category": "Family",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": null,
+    "appleBilledOption": true,
+    "steps": [
+      {"order":1,"action":"Open Settings → [Your Name] → Subscriptions → Apple One.","supportingNote":null},
+      {"order":2,"action":"Tap 'Choose Individual Services' if you want to keep one or two — Apple will price them individually.","supportingNote":"Use this to avoid losing Apple Music while ending the bundle."},
+      {"order":3,"action":"Tap 'Cancel All Services' to end the entire bundle.","supportingNote":null},
+      {"order":4,"action":"Confirm.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 2,
+    "warningNote": "Cancelling Apple One ends Apple Music, Apple TV+, Arcade, iCloud+, Fitness+ and News+ together. Use 'Choose Individual Services' to keep specific items.",
+    "notes": null
+  },
+  {
+    "id": "adobe-creative-cloud",
+    "serviceName": "Adobe Creative Cloud",
+    "category": "SaaS",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://account.adobe.com/plans",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"CHECK YOUR PLAN TYPE FIRST: 'Annual, paid monthly' triggers a 50% Early Termination Fee (ETF) on cancel after day 14.","supportingNote":"'Monthly' plans have no ETF. 'Annual, prepaid' is non-refundable but no extra ETF."},
+      {"order":2,"action":"Open account.adobe.com/plans and sign in.","supportingNote":null},
+      {"order":3,"action":"Click 'Manage plan' on your active plan, then 'Cancel your plan'.","supportingNote":null},
+      {"order":4,"action":"Adobe will show the exact ETF amount before you confirm — read it carefully.","supportingNote":"The DOJ stipulated order (March 13, 2026) requires clear pre-purchase disclosure of ETFs."},
+      {"order":5,"action":"Try the downgrade-then-cancel loophole: switch to the Photography plan ($9.99) first, then cancel — sometimes resets the ETF to zero.","supportingNote":"Not guaranteed; results vary. Adobe may close this gap."},
+      {"order":6,"action":"Confirm cancellation and save the email with the final billed amount.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 10,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 9,
+    "warningNote": "On March 13, 2026, the U.S. Department of Justice announced a $150 million stipulated order against Adobe — $75 million in civil penalties paid to the U.S. Treasury and $75 million in free services for qualifying customers — over hidden ETFs and difficult cancellation. The complaint also named two Adobe executives personally: David Wadhwani (president, digital media) and Maninder Sawhney (VP). The 50% ETF (annual-paid-monthly) still exists. Cancel within the first 14 days for a full refund. Verify your plan type before pressing cancel.",
+    "notes": null
+  },
+  {
+    "id": "microsoft-365",
+    "serviceName": "Microsoft 365",
+    "category": "SaaS",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://account.microsoft.com/services/microsoft365",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Sign in at account.microsoft.com/services.","supportingNote":null},
+      {"order":2,"action":"Find Microsoft 365 and tap 'Manage' → 'Cancel subscription' or 'Turn off recurring billing'.","supportingNote":"Within 30 days of charge you can request a prorated refund."},
+      {"order":3,"action":"Confirm the cancellation reason and save the email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 4,
+    "warningNote": null,
+    "notes": "Family sharing: only the subscription owner can cancel; other members lose access at period end."
+  },
+  {
+    "id": "dropbox",
+    "serviceName": "Dropbox",
+    "category": "SaaS",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.dropbox.com/account/plan",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open dropbox.com/account/plan and sign in.","supportingNote":null},
+      {"order":2,"action":"Scroll to the bottom and click 'Cancel plan'.","supportingNote":"The button is small and below the plan summary — easy to miss."},
+      {"order":3,"action":"Choose a reason and confirm.","supportingNote":null},
+      {"order":4,"action":"Save the email confirmation.","supportingNote":"Files over the free 2 GB limit go read-only until you free up space."}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 4,
+    "warningNote": null,
+    "notes": null
+  },
+  {
+    "id": "1password",
+    "serviceName": "1Password",
+    "category": "SaaS",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://my.1password.com/",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Export your vaults to .1pux or .csv files before cancellation as a backup.","supportingNote":"You can still view and export later in the frozen state, but better to act now."},
+      {"order":2,"action":"Sign in at my.1password.com → 'Billing'.","supportingNote":null},
+      {"order":3,"action":"Click 'Cancel subscription'. Account remains active until period end.","supportingNote":"Per 1Password help: 'Your canceled subscription will remain active until the end of the current billing period, then your account will be frozen.'"},
+      {"order":4,"action":"After period end the account enters 'frozen' state: you can view and copy items but cannot add or edit.","supportingNote":"Per 1Password support: 'you can still view all your items, copy your passwords, and even copy items to vaults outside your account.'"}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 2,
+    "warningNote": "After cancellation your account is 'frozen' — effectively read-only. You can sign in and view/export data indefinitely but cannot make changes. Export to a successor manager BEFORE the freeze if migrating.",
+    "notes": null
+  },
+  {
+    "id": "notion",
+    "serviceName": "Notion",
+    "category": "SaaS",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.notion.so/settings/billing",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open notion.so/settings/billing as the workspace Owner.","supportingNote":"Only Workspace Owners (not Admins) can cancel."},
+      {"order":2,"action":"Switch to the workspace you want to downgrade.","supportingNote":null},
+      {"order":3,"action":"Click 'Cancel subscription' under Plan.","supportingNote":null},
+      {"order":4,"action":"Confirm; the workspace downgrades to the Free plan at period end.","supportingNote":"Block limits return for some legacy workspaces."}
+    ],
+    "estimatedTimeMinutes": 4,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": null,
+    "notes": null
+  },
+  {
+    "id": "linear",
+    "serviceName": "Linear",
+    "category": "SaaS",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://linear.app/",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"As a workspace admin, open Linear → Settings → Workspace → Plans.","supportingNote":"Per Linear's billing docs (linear.app/docs/billing-and-plans): 'Workspace admins can change or cancel a subscription from Settings > Workspace > Plans.'"},
+      {"order":2,"action":"Click 'Cancel subscription'.","supportingNote":"Takes effect at end of billing period. Per Linear docs: 'Subscription updates take effect at the end of the subscription period.'"},
+      {"order":3,"action":"Alternatively, email billing@linear.app from the workspace owner's address — Linear must confirm in writing per ToS.","supportingNote":"Per Linear Terms: 'Customer may choose not to renew its Subscription Period by notifying Linear at billing@linear.app... or by modifying its subscription through Customer's account within the Service.'"},
+      {"order":4,"action":"Save the confirmation email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": "Linear does NOT provide mid-cycle refunds. Per Linear docs: 'We do not provide refunds for cancellations mid-subscription.' Cancel before the next renewal date.",
+    "notes": null
+  },
+  {
+    "id": "figma",
+    "serviceName": "Figma",
+    "category": "SaaS",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.figma.com/",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"As Admin or Owner, locate your Professional team in the file browser sidebar.","supportingNote":null},
+      {"order":2,"action":"Click 'Admin' (NOT 'Billing').","supportingNote":"This is the counter-intuitive step — cancel lives under Admin, not Billing."},
+      {"order":3,"action":"Select the 'Settings' tab (also NOT Billing tab).","supportingNote":"Per Figma support: 'In the Admin section there is a Settings tab and there is a Cancel plan button.'"},
+      {"order":4,"action":"In the 'Plan' section, click 'Cancel plan'.","supportingNote":null},
+      {"order":5,"action":"Choose a cancellation reason and confirm.","supportingNote":null},
+      {"order":6,"action":"For Organization or Enterprise plans, email support@figma.com at least 30 days before the renewal date.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 10,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 7,
+    "warningNote": "The Cancel button is hidden in Admin → Settings → Plan, NOT in the Billing tab. Figma payments are non-refundable; prorated seat charges may appear on the final invoice.",
+    "notes": null
+  },
+  {
+    "id": "github-copilot",
+    "serviceName": "GitHub Copilot",
+    "category": "SaaS",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://github.com/settings/billing",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open github.com/settings/billing and sign in.","supportingNote":null},
+      {"order":2,"action":"Click 'Plans and usage' → find Copilot.","supportingNote":null},
+      {"order":3,"action":"Click 'Cancel Copilot'.","supportingNote":"Access continues to period end."},
+      {"order":4,"action":"Confirm and save the email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 6,
+    "warningNote": null,
+    "notes": "Organization-billed Copilot must be cancelled by the org admin in Settings → Billing → Copilot. Individual cancellation via personal Settings does not affect org seats."
+  },
+  {
+    "id": "chatgpt-plus",
+    "serviceName": "ChatGPT Plus",
+    "category": "AI",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://chatgpt.com/#settings/Subscription",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"If you subscribed in the iOS ChatGPT app, cancel via Settings → Apple ID → Subscriptions on your iPhone (Apple billing).","supportingNote":null},
+      {"order":2,"action":"Otherwise, open chatgpt.com → click your name → Settings → Subscription.","supportingNote":null},
+      {"order":3,"action":"Click 'Manage my subscription' → 'Cancel plan'.","supportingNote":null},
+      {"order":4,"action":"Confirm.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 2,
+    "warningNote": null,
+    "notes": null
+  },
+  {
+    "id": "claude-pro",
+    "serviceName": "Claude Pro",
+    "category": "AI",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://claude.ai/settings/billing",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open claude.ai/settings/billing and sign in.","supportingNote":null},
+      {"order":2,"action":"Click 'Manage Subscription' → 'Cancel Plan'.","supportingNote":null},
+      {"order":3,"action":"Confirm.","supportingNote":"Access continues to period end."}
+    ],
+    "estimatedTimeMinutes": 2,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 1,
+    "warningNote": null,
+    "notes": "iOS subscribers cancel through Apple Subscriptions instead."
+  },
+  {
+    "id": "perplexity-pro",
+    "serviceName": "Perplexity Pro",
+    "category": "AI",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.perplexity.ai/settings/account",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open perplexity.ai/settings/account and sign in.","supportingNote":null},
+      {"order":2,"action":"Scroll to 'Subscription' → click 'Cancel Subscription'.","supportingNote":null},
+      {"order":3,"action":"Confirm.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 3,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 2,
+    "warningNote": null,
+    "notes": "If your plan was provided via a partner promotion (e.g., a phone carrier), cancellation happens at the partner."
+  },
+  {
+    "id": "cursor",
+    "serviceName": "Cursor",
+    "category": "AI",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://cursor.com/dashboard?tab=billing",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open cursor.com/dashboard?tab=billing and sign in.","supportingNote":null},
+      {"order":2,"action":"Click 'Manage Subscription' (opens a Stripe-hosted portal).","supportingNote":null},
+      {"order":3,"action":"Click 'Cancel plan' and confirm.","supportingNote":null},
+      {"order":4,"action":"Save the Stripe email receipt.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 4,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": null,
+    "notes": null
+  },
+  {
+    "id": "nytimes",
+    "serviceName": "New York Times",
+    "category": "News",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://myaccount.nytimes.com/cancel",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"California subscribers: open myaccount.nytimes.com/cancel for fully self-serve online cancellation (24/7).","supportingNote":"Per NYT help: 'Chat is accessible between 7 a.m. and 10 p.m. E.T. on Monday – Friday, and 7 a.m. and 3 p.m. E.T. on weekends and holidays (or 24 hours a day 7 days a week for subscribers in California).'"},
+      {"order":2,"action":"Other regions: same URL, but you may be routed to a 'Care Advocate' chat (M-F 7am-10pm ET, weekends 7am-3pm ET).","supportingNote":null},
+      {"order":3,"action":"In chat, state: 'I'd like to cancel my subscription, please proceed without retention offers.'","supportingNote":"Be prepared for ~8 minutes of retention dialog regardless."},
+      {"order":4,"action":"Decline the discount tiers (often 50% off for 1 year).","supportingNote":null},
+      {"order":5,"action":"Ask for a written confirmation in the chat transcript and a confirmation email.","supportingNote":"Screenshot the transcript."}
+    ],
+    "estimatedTimeMinutes": 8,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 8,
+    "warningNote": "Outside California, NYT may require live-chat cancellation with multi-step retention. California subscribers have 24/7 self-serve online cancellation, partly as a result of the $2,375,000 class settlement in Moses et al v. The New York Times Co., which the Second Circuit upheld on February 10, 2026 (per Law360: 'A Second Circuit panel on Tuesday upheld a class action settlement resolving claims that The New York Times Co. auto-renewed California users' subscriptions without proper notice.'). Always obtain a written confirmation.",
+    "notes": null
+  },
+  {
+    "id": "wsj",
+    "serviceName": "Wall Street Journal",
+    "category": "News",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://customercenter.wsj.com/view/cancel",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open customercenter.wsj.com/view/cancel and sign in.","supportingNote":null},
+      {"order":2,"action":"Confirm your active plan.","supportingNote":null},
+      {"order":3,"action":"Click 'Cancel Subscription' and decline retention offers.","supportingNote":null},
+      {"order":4,"action":"Save the confirmation email; verify next statement.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 8,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 6,
+    "warningNote": null,
+    "notes": "If your WSJ subscription is bundled with Barron's or MarketWatch via the All Access plan, cancellation applies to all bundled products."
+  },
+  {
+    "id": "financial-times",
+    "serviceName": "Financial Times",
+    "category": "News",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://myaccount.ft.com/account-management/cancel/index",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open myaccount.ft.com/account-management/cancel/index and sign in.","supportingNote":null},
+      {"order":2,"action":"Click through the 'save me' journey: FT will show FOMO messaging (value of brand) and a price-freeze offer.","supportingNote":"Per FT Strategies (the Financial Times's own consulting arm, ftstrategies.com): 'This new journey yielded a more positive save rate of 6% (doubled compared with the previous 3% save rate).'"},
+      {"order":3,"action":"Decline each save offer.","supportingNote":null},
+      {"order":4,"action":"Confirm cancellation and save the email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 10,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 8,
+    "warningNote": "FT runs a documented 'save me' retention journey with FOMO copy and a price freeze. The flow is online (no phone required), but expect multiple screens. EU/UK subscribers have a 14-day cooling-off right.",
+    "notes": null
+  },
+  {
+    "id": "the-guardian",
+    "serviceName": "The Guardian",
+    "category": "News",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://manage.theguardian.com/",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open manage.theguardian.com and sign in.","supportingNote":null},
+      {"order":2,"action":"Find your contribution/subscription and click 'Cancel'.","supportingNote":null},
+      {"order":3,"action":"Choose a reason and confirm.","supportingNote":"The Guardian's flow is unusually low-friction by design."},
+      {"order":4,"action":"Save the email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 4,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": null,
+    "notes": null
+  },
+  {
+    "id": "bloomberg",
+    "serviceName": "Bloomberg",
+    "category": "News",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.bloomberg.com/account/subscription",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open bloomberg.com/account/subscription and sign in.","supportingNote":null},
+      {"order":2,"action":"Navigate to the 'Subscription' tab and look for 'Cancel Subscription'.","supportingNote":"The button is sometimes disabled or hidden — Bloomberg may force chat or email."},
+      {"order":3,"action":"If the button is missing: click the Chat Bubble on the Help page and request cancellation, OR email contactus@bloombergsupport.com.","supportingNote":"Phone alternative: 1-212-318-2000."},
+      {"order":4,"action":"Cancel at least 3 days before renewal — Bloomberg does NOT issue prorated refunds.","supportingNote":null},
+      {"order":5,"action":"Get written confirmation.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 8,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 7,
+    "warningNote": "The web 'Cancel Subscription' button is frequently missing or disabled. Bloomberg routes many users to chat (Messaging Assistant), email (contactus@bloombergsupport.com), or phone (1-212-318-2000). No prorated refunds.",
+    "notes": null
+  },
+  {
+    "id": "the-atlantic",
+    "serviceName": "The Atlantic",
+    "category": "News",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://accounts.theatlantic.com/account/subscription",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Sign in at accounts.theatlantic.com/account/subscription.","supportingNote":null},
+      {"order":2,"action":"Click 'Cancel Subscription' under your plan.","supportingNote":null},
+      {"order":3,"action":"Decline the retention discount and confirm.","supportingNote":null},
+      {"order":4,"action":"Save the email confirmation.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 4,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": null,
+    "notes": null
+  },
+  {
+    "id": "peloton",
+    "serviceName": "Peloton App",
+    "category": "Fitness",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://members.onepeloton.com/account/subscriptions",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open members.onepeloton.com/account/subscriptions and sign in.","supportingNote":null},
+      {"order":2,"action":"Tap 'Cancel Membership' next to App Membership.","supportingNote":null},
+      {"order":3,"action":"Confirm and save the email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 4,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": null,
+    "notes": "If your Peloton subscription is the All-Access Membership tied to Bike/Tread/Row hardware, you cannot cancel while you own the connected device; only the Peloton App membership is self-serve."
+  },
+  {
+    "id": "apple-fitness-plus",
+    "serviceName": "Apple Fitness+",
+    "category": "Fitness",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": null,
+    "appleBilledOption": true,
+    "steps": [
+      {"order":1,"action":"Open Settings → [Your Name] → Subscriptions on iPhone.","supportingNote":null},
+      {"order":2,"action":"Tap 'Apple Fitness+' (or 'Apple One' if bundled) and 'Cancel Subscription'.","supportingNote":null},
+      {"order":3,"action":"Confirm.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 2,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 1,
+    "warningNote": "If you have Apple One Premier, Fitness+ cannot be cancelled independently — use Apple One's 'Choose Individual Services' to keep Music/TV+ and drop Fitness+.",
+    "notes": null
+  },
+  {
+    "id": "strava",
+    "serviceName": "Strava",
+    "category": "Fitness",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.strava.com/settings/profile",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open strava.com (the iOS app does not allow direct cancellation for web-billed accounts).","supportingNote":null},
+      {"order":2,"action":"Go to your profile picture → Settings → My Account.","supportingNote":null},
+      {"order":3,"action":"Scroll to 'Subscription' → 'Cancel subscription' (also called 'Downgrade to the Free Plan').","supportingNote":null},
+      {"order":4,"action":"Confirm.","supportingNote":"You keep premium features until period end."}
+    ],
+    "estimatedTimeMinutes": 4,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": "Per Strava support: 'You may be eligible for a full refund within 14 days of purchase. After 14 days, Strava subscriptions are non-refundable.' iOS-billed subscriptions must be cancelled via Apple Subscriptions.",
+    "notes": null
+  },
+  {
+    "id": "nike-training-club",
+    "serviceName": "Nike Training Club",
+    "category": "Fitness",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": null,
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Nike Training Club has been FREE for all users since April 2020 — there is no subscription to cancel.","supportingNote":"If you are being charged, you are subscribed to a different fitness service. Verify your card statement."},
+      {"order":2,"action":"To stop using NTC: just delete the app from your phone.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 0,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 1,
+    "warningNote": null,
+    "notes": "Nike removed all paid tiers in April 2020. If users see this entry in Drift's tracker they likely mis-tagged another subscription."
+  },
+  {
+    "id": "whoop",
+    "serviceName": "Whoop",
+    "category": "Fitness",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://support.whoop.com/",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Check your commitment period in app.whoop.com → Membership. Standard is 12 months; some users opted into 24-month plans for a lower rate.","supportingNote":null},
+      {"order":2,"action":"Export your data first (app.whoop.com → avatar → Download Your Data).","supportingNote":null},
+      {"order":3,"action":"Open support.whoop.com and start a cancellation chat. Whoop does NOT have a self-serve cancel button.","supportingNote":null},
+      {"order":4,"action":"If past your commitment end date: ask the agent to cancel and stop auto-renewal.","supportingNote":null},
+      {"order":5,"action":"If still within commitment: you must pay the remaining contract balance to terminate early.","supportingNote":"Alternatively, ask to pause your membership."},
+      {"order":6,"action":"Get a written confirmation by email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 5,
+    "warningNote": "Whoop has a hard 12- or 24-month commitment. Cancelling mid-commitment requires paying out the remaining contract balance. Pausing is offered for injury, travel, or financial breaks.",
+    "notes": null
+  },
+  {
+    "id": "xbox-game-pass",
+    "serviceName": "Xbox Game Pass",
+    "category": "Gaming",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://account.microsoft.com/services",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Sign in at account.microsoft.com/services.","supportingNote":null},
+      {"order":2,"action":"Find Xbox Game Pass Ultimate (or Premium/Essential) and tap 'Manage' → 'Cancel'.","supportingNote":null},
+      {"order":3,"action":"Decline the retention offer (1-3 months at reduced price).","supportingNote":null},
+      {"order":4,"action":"Choose 'Turn off recurring billing' OR 'Cancel now'.","supportingNote":"'Cancel now' may offer a partial refund; 'Turn off recurring' lets you finish the paid period."},
+      {"order":5,"action":"Confirm.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 8,
+    "warningNote": "Ultimate price was raised from $19.99 to $29.99/mo effective October 1, 2025 — a 50% jump that triggered mass cancellations. Under new Microsoft Gaming chief Asha Sharma (former Meta VP who replaced Phil Spencer in February 2026), Microsoft walked the price back to $22.99/mo on April 21, 2026 (per Xbox Wire: 'Starting today, Game Pass Ultimate drops from $29.99 to $22.99 a month.'). If you cancel your current grandfathered rate and try to resubscribe later, you may not get the same price back. Decide deliberately.",
+    "notes": null
+  },
+  {
+    "id": "playstation-plus",
+    "serviceName": "PlayStation Plus",
+    "category": "Gaming",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.playstation.com/acct/management",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Sign in at playstation.com → Account Management → Subscription.","supportingNote":null},
+      {"order":2,"action":"Find PlayStation Plus and click 'Cancel Subscription'.","supportingNote":null},
+      {"order":3,"action":"If you are within 14 days of initial purchase, request a refund via PlayStation Support — Sony provides a prorated refund based on usage.","supportingNote":null},
+      {"order":4,"action":"After 14 days: cancellation just turns off auto-renew; no refund.","supportingNote":null},
+      {"order":5,"action":"Confirm.","supportingNote":"After lapse, Essential monthly games become inaccessible; Extra/Premium catalog also locks."}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 6,
+    "warningNote": "Strict 14-day refund window. Free monthly games (Essential tier) and the Extra/Premium game catalogs become inaccessible immediately after the subscription ends, even though you 'claimed' them.",
+    "notes": null
+  },
+  {
+    "id": "nintendo-switch-online",
+    "serviceName": "Nintendo Switch Online",
+    "category": "Gaming",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://accounts.nintendo.com/",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open accounts.nintendo.com and sign in.","supportingNote":null},
+      {"order":2,"action":"Go to 'Shop Menu' → 'Your Subscriptions'.","supportingNote":null},
+      {"order":3,"action":"Find Nintendo Switch Online → tap 'Turn Off Automatic Renewal'.","supportingNote":"Per Nintendo Support: once auto-renewal is off, it cannot be turned back on again — you can only repurchase."},
+      {"order":4,"action":"Confirm.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 4,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 5,
+    "warningNote": "No refunds. Per Nintendo Support: 'If a Nintendo Switch Online membership expires, users won't be able to access their Save Data Cloud backups. However, Nintendo will allow users who resubscribe within 180 days to access their previous Save Data Cloud backups.' Auto-renewal cannot be re-enabled once disabled — you must repurchase a new term.",
+    "notes": null
+  },
+  {
+    "id": "amazon-prime",
+    "serviceName": "Amazon Prime",
+    "category": "E-commerce",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.amazon.com/gp/primecentral",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open amazon.com/gp/primecentral and sign in.","supportingNote":null},
+      {"order":2,"action":"Click 'Manage Membership' → 'End Membership'.","supportingNote":"This starts the 'Iliad Flow' — described by the FTC as 'a four-page, six-click, fifteen-option cancellation process'."},
+      {"order":3,"action":"Decline 'Pause Membership' (often offered as the first save).","supportingNote":null},
+      {"order":4,"action":"Decline the '3 benefits you'll lose' reminder screen.","supportingNote":"Amazon emphasises Prime Video / shipping / Music to create FOMO."},
+      {"order":5,"action":"Decline the discounted re-offer (often $2-3/mo less).","supportingNote":null},
+      {"order":6,"action":"Choose 'End Now' (forfeits remaining paid time) OR 'End on [date]' (keeps benefits till period end).","supportingNote":null},
+      {"order":7,"action":"Save the email confirmation.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 10,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 8,
+    "warningNote": "On September 25, 2025, in the U.S. District Court for the Western District of Washington, Judge John H. Chun entered a $2.5 billion FTC order against Amazon — $1 billion civil penalty (the largest ever obtained for an FTC rule violation) plus $1.5 billion in consumer redress to an estimated 35 million customers — over the 'Iliad' cancellation flow. Per the order, Amazon must simplify cancellation, but the multi-screen flow is still in force as of May 2026; expect 4-6 confirmation screens.",
+    "notes": null
+  },
+  {
+    "id": "walmart-plus",
+    "serviceName": "Walmart+",
+    "category": "E-commerce",
+    "regionAvailability": ["US"],
+    "primaryCancelURL": "https://www.walmart.com/account/wplus/manage",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open walmart.com/account/wplus/manage and sign in.","supportingNote":null},
+      {"order":2,"action":"Tap 'Manage Membership' → 'Cancel Membership'.","supportingNote":null},
+      {"order":3,"action":"If you are within 15 days of paid signup and have not used benefits, request a full refund via Walmart Customer Care (1-800-924-9206).","supportingNote":"Beyond 15 days, no refund; benefits continue to period end."},
+      {"order":4,"action":"Confirm cancellation; save the email.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 5,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 4,
+    "warningNote": "The bundled Paramount+ Essential perk is included with Walmart+. Cancelling Walmart+ stops the perk at period end. Refunds only within 15 days of signup with unused benefits.",
+    "notes": null
+  },
+  {
+    "id": "doordash-dashpass",
+    "serviceName": "DoorDash DashPass",
+    "category": "E-commerce",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": "https://www.doordash.com/consumer/manage_membership/",
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"Open doordash.com/consumer/manage_membership and sign in.","supportingNote":null},
+      {"order":2,"action":"Click 'End Subscription'.","supportingNote":"Cancel at least 24 hours before renewal to avoid the next charge."},
+      {"order":3,"action":"Choose a reason; decline retention offer.","supportingNote":null},
+      {"order":4,"action":"Confirm.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 4,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 3,
+    "warningNote": null,
+    "notes": "If subscribed via the iOS app via Apple billing, cancel through Apple Subscriptions."
+  },
+  {
+    "id": "uber-one",
+    "serviceName": "Uber One",
+    "category": "E-commerce",
+    "regionAvailability": ["US","UK","CA","AU"],
+    "primaryCancelURL": null,
+    "appleBilledOption": false,
+    "steps": [
+      {"order":1,"action":"CANCEL AT LEAST 48 HOURS BEFORE YOUR NEXT BILLING DATE.","supportingNote":"Within 48h of billing, the in-app cancel option is removed; you must contact support."},
+      {"order":2,"action":"Open the Uber app → tap your account icon → 'Uber One' → 'Manage Membership' → 'End Membership'.","supportingNote":"Normal flow: ~7 screens, ~12 actions."},
+      {"order":3,"action":"Decline each retention offer (free delivery month, lower price, pause).","supportingNote":null},
+      {"order":4,"action":"Tap 'End Membership' on the final screen.","supportingNote":null},
+      {"order":5,"action":"If you are within 48h of billing and cannot find the cancel button: go to help.uber.com → 'Uber One' → 'Cancel my membership' → submit a written request.","supportingNote":"Keep all screenshots."},
+      {"order":6,"action":"Verify your next statement; dispute any post-cancel charges with your card issuer.","supportingNote":null}
+    ],
+    "estimatedTimeMinutes": 15,
+    "lastVerifiedDate": "2026-05-27",
+    "darkPatternScore": 9,
+    "warningNote": "Per FTC press release (December 15, 2025) and Uber, FTC v. (Case No. 2423092, N.D. Cal.), the FTC and 21 state attorneys general filed an Amended Complaint alleging Uber One's cancellation flow can require 'as many as 23 separate screens and... up to 32 distinct actions' to finalize, particularly within 48 hours of renewal. A Second Amended Complaint was filed May 4, 2026; the case is ongoing. Cancel days in advance.",
+    "notes": null
+  }
+]
