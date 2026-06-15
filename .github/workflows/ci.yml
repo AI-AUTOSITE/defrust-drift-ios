@@ -92,10 +92,16 @@ jobs:
 
           echo "Running tests on simulator id: $DEVICE_ID"
 
+          # Skip the StoreKit suite on CI. SKTestSession is unreliable on the runner's
+          # simulator (cold-start hangs; FB22237318 on 26.3–26.5) and these are validated
+          # locally instead. The suite's `.enabled(if: env["CI"] == nil)` trait does NOT
+          # fire here: the runner's CI=true is a HOST var and is not forwarded into the
+          # simulator test process, so the skip must be expressed at the xcodebuild level.
           xcodebuild test \
             -project Drift.xcodeproj \
             -scheme Drift \
             -testPlan DriftUnit \
+            -skip-testing:DriftTests/DriftStorePurchaseTests \
             -destination "id=$DEVICE_ID" \
             -resultBundlePath build/TestResults.xcresult \
             -enableCodeCoverage YES \
