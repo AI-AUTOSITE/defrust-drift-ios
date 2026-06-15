@@ -91,7 +91,35 @@ public final class NotificationScheduler: NSObject {
             sortBy: [SortDescriptor(\.nextRenewalDate, order: .forward)]
         )
         let subs = (try? context.fetch(descriptor)) ?? []
+        let requests = buildRequests(from: subs)
 
+        let planned = NotificationPlanner.plan(for: requests, now: now, calendar: calendar)
+        let plannedByID = Dictionary(planned.map { ($0.id, $0) }, uniquingKeysWith: { lhs, _ in lhs })
+
+        // Clear Drift's pending reminders first; only prompt for permission if there is work.
+        await clearPendingRenewals()
+        guard !planned.isEmpty else { return }
+        guard await requestAuthorizationIfNeeded() else { return }
+
+        for sub in subs {
+            for note in sub.unwrappedNotifications where note.isEnabled {
+                let id = identifier(subscriptionID: sub.id, daysBefore: note.daysBeforeRenewal)
+                guard let plan = plannedByID[id] else { continue }
+                do {
+                    try await center.add(notificationRequest(for: sub, note: note, fireDate: plan.fireDate))
+                    note.lastScheduledFireDate = plan.fireDate
+                    note.subscriptionID = sub.id   // keep the CloudKit backup link meaningful
+                } catch {
+                    // A failed add (e.g. a 64-cap race) is non-fatal; the next reschedule retries.
+                }
+            }
+        }
+    }
+
+    // MARK: - Reschedule helpers
+
+    /// Build planner inputs from the active subscriptions that have enabled reminders.
+    private func buildRequests(from subs: [Subscription]) -> [SubscriptionNotificationRequest] {
         var requests: [SubscriptionNotificationRequest] = []
         for sub in subs {
             let enabledDays = sub.unwrappedNotifications
@@ -106,50 +134,42 @@ public final class NotificationScheduler: NSObject {
                 daysBeforeOptions: enabledDays
             ))
         }
+        return requests
+    }
 
-        let planned = NotificationPlanner.plan(for: requests, now: now, calendar: calendar)
-        let plannedByID = Dictionary(planned.map { ($0.id, $0) }, uniquingKeysWith: { lhs, _ in lhs })
-
-        // Clear Drift's pending reminders first; only prompt for permission if there is work.
+    /// Remove every pending Drift renewal reminder (the `renewal-` namespace).
+    private func clearPendingRenewals() async {
         let pending = await center.pendingNotificationRequests()
         let driftIDs = pending.map(\.identifier).filter { $0.hasPrefix("renewal-") }
         if !driftIDs.isEmpty {
             center.removePendingNotificationRequests(withIdentifiers: driftIDs)
         }
-        guard !planned.isEmpty else { return }
-        guard await requestAuthorizationIfNeeded() else { return }
+    }
 
-        for sub in subs {
-            for note in sub.unwrappedNotifications where note.isEnabled {
-                let id = identifier(subscriptionID: sub.id, daysBefore: note.daysBeforeRenewal)
-                guard let plan = plannedByID[id] else { continue }
+    /// Build the calendar-triggered request for one reminder. The body shows the renewal
+    /// (charge) date, not the reminder's fire date.
+    private func notificationRequest(
+        for sub: Subscription,
+        note: RenewalNotification,
+        fireDate: Date
+    ) -> UNNotificationRequest {
+        let content = UNMutableNotificationContent()
+        let dayWord = note.daysBeforeRenewal == 1 ? "day" : "days"
+        content.title = "\(sub.name) renews in \(note.daysBeforeRenewal) \(dayWord)"
+        let formatted = ExchangeRates.format(sub.monthlyCost, currencyCode: sub.currencyCode)
+        content.body = "\(formatted) on \(sub.nextRenewalDate.formatted(date: .abbreviated, time: .omitted))."
+        content.sound = .default
+        content.categoryIdentifier = categoryIdentifier
+        content.threadIdentifier = "renewal-\(sub.id.uuidString)"
+        content.userInfo = [
+            "subscriptionID": sub.id.uuidString,
+            "kind": "renewal"
+        ]
 
-                let content = UNMutableNotificationContent()
-                let dayWord = note.daysBeforeRenewal == 1 ? "day" : "days"
-                content.title = "\(sub.name) renews in \(note.daysBeforeRenewal) \(dayWord)"
-                let formatted = ExchangeRates.format(sub.monthlyCost, currencyCode: sub.currencyCode)
-                // Body shows the renewal (charge) date, not the reminder's fire date.
-                content.body = "\(formatted) on \(sub.nextRenewalDate.formatted(date: .abbreviated, time: .omitted))."
-                content.sound = .default
-                content.categoryIdentifier = categoryIdentifier
-                content.threadIdentifier = "renewal-\(sub.id.uuidString)"
-                content.userInfo = [
-                    "subscriptionID": sub.id.uuidString,
-                    "kind": "renewal"
-                ]
-
-                let comps = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: plan.fireDate)
-                let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
-                let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
-                do {
-                    try await center.add(request)
-                    note.lastScheduledFireDate = plan.fireDate
-                    note.subscriptionID = sub.id   // keep the CloudKit backup link meaningful
-                } catch {
-                    // A failed add (e.g. a 64-cap race) is non-fatal; the next reschedule retries.
-                }
-            }
-        }
+        let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
+        let id = identifier(subscriptionID: sub.id, daysBefore: note.daysBeforeRenewal)
+        return UNNotificationRequest(identifier: id, content: content, trigger: trigger)
     }
 
     // MARK: - Targeted cancel (e.g. on delete or pause)
