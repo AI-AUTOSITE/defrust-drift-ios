@@ -1,3 +1,8 @@
+//
+//  SharedModelContainer.swift
+//  Drift
+//
+
 import Foundation
 import SwiftData
 
@@ -11,20 +16,19 @@ import SwiftData
 enum SharedModelContainer {
     static let shared: ModelContainer = makeContainer()
 
+    private static let appGroupID = "group.com.defrust.drift"
+    private static let cloudKitContainerID = "iCloud.com.defrust.drift"
+
     private static func makeContainer() -> ModelContainer {
         let schema = Schema(versionedSchema: DriftSchemaV1.self)
 
         // Primary: App Group store + private CloudKit (production path).
-        let cloudConfig = ModelConfiguration(
-            schema: schema,
-            groupContainer: .identifier("group.com.defrust.drift"),
-            cloudKitDatabase: .private("iCloud.com.defrust.drift")
-        )
-        if let container = try? ModelContainer(
-            for: schema,
-            migrationPlan: DriftMigrationPlan.self,
-            configurations: [cloudConfig]
-        ) {
+        // `ModelConfiguration(groupContainer:)` TRAPS (it doesn't throw) when the
+        // app isn't entitled to the group, so we must confirm the container is
+        // reachable BEFORE building that configuration — otherwise the fallback
+        // below can never run. The App Group / iCloud capabilities are added in
+        // Week 2; until then this branch is skipped and we run on local storage.
+        if isAppGroupAvailable, let container = try? makeCloudContainer(schema: schema) {
             return container
         }
 
@@ -46,5 +50,25 @@ enum SharedModelContainer {
         }
 
         fatalError("Drift could not create any ModelContainer for DriftSchemaV1.")
+    }
+
+    /// Whether this build is actually entitled to the App Group. Returns `false`
+    /// (never traps) when the capability hasn't been configured yet.
+    private static var isAppGroupAvailable: Bool {
+        FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil
+    }
+
+    private static func makeCloudContainer(schema: Schema) throws -> ModelContainer {
+        let cloudConfig = ModelConfiguration(
+            schema: schema,
+            groupContainer: .identifier(appGroupID),
+            cloudKitDatabase: .private(cloudKitContainerID)
+        )
+        return try ModelContainer(
+            for: schema,
+            migrationPlan: DriftMigrationPlan.self,
+            configurations: [cloudConfig]
+        )
     }
 }

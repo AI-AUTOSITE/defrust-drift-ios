@@ -10,8 +10,6 @@
 import SwiftData
 import SwiftUI
 
-private typealias Subscription = DriftSchemaV1.Subscription
-
 struct OverviewView: View {
     @Query(sort: \Subscription.nextRenewalDate)
     private var subscriptions: [Subscription]
