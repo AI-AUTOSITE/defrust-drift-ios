@@ -36,6 +36,8 @@ struct DarkPatternBadge: View {
             Text(label)
                 .font(.subheadline)
         }
+        .lineLimit(1)
+        .fixedSize(horizontal: true, vertical: false)
         .foregroundStyle(.white)
         .padding(.horizontal, DriftSpacing.s8)
         .padding(.vertical, DriftSpacing.s4)

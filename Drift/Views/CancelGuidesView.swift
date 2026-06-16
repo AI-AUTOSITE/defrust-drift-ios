@@ -54,9 +54,11 @@ private struct CancelGuideRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(guide.serviceName)
                     .font(.body)
+                    .lineLimit(1)
                 Text(guide.category)
                     .font(.footnote)
                     .foregroundStyle(DriftTheme.subtleText)
+                    .lineLimit(1)
             }
 
             Spacer(minLength: DriftSpacing.s8)
