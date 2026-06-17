@@ -37,6 +37,8 @@ struct ServicePickerView: View {
                         dismiss()
                     } label: {
                         Label("Custom (no linked service)", systemImage: "square.dashed")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }
@@ -58,6 +60,7 @@ struct ServicePickerView: View {
                                 Spacer(minLength: DriftSpacing.s8)
                                 DarkPatternBadge(score: guide.darkPatternScore)
                             }
+                            .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                     }
