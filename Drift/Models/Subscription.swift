@@ -18,8 +18,10 @@ extension DriftSchemaV1 {
         var customColor: String = "#5E5CE6" // hex string (systemIndigo)
 
         // MARK: - Cost
-        /// Normalized monthly cost. Yearly input is stored /12, weekly *4.345
-        /// (conversion logic lives in the view model), so totals are a plain sum.
+        /// Normalized monthly cost. Yearly input is stored /12, weekly ×4
+        /// (4-weeks-per-month convention — see bug #22). The per-cycle ⇄ monthly
+        /// conversion lives in `BillingCycle.monthlyCost(forCycleAmount:)` /
+        /// `cycleAmount(forMonthlyCost:)`, so totals are a plain sum.
         var monthlyCost: Decimal = 0
         var currencyCode: String = "USD" // ISO 4217
         var billingCycleRaw: String = BillingCycle.monthly.rawValue

@@ -7,10 +7,16 @@
 //  tap sets a route. The Liquid Glass tab bar comes for free on iOS 26 just by
 //  using TabView; we additionally minimize it on scroll-down there.
 //
+//  On first appearance it seeds the ten default categories so the Add form has
+//  something to pick from on a fresh install. `seedIfNeeded` is idempotent
+//  (it no-ops once any category exists), so calling it on appear is safe.
+//
 
+import SwiftData
 import SwiftUI
 
 struct RootView: View {
+    @Environment(\.modelContext) private var context
     @State private var router = DriftDeepLinkRouter.shared
     @State private var selection: AppTab = .overview
 
@@ -30,6 +36,7 @@ struct RootView: View {
         }
         .tint(DriftTheme.accent)
         .modifier(GlassTabBarBehavior())
+        .onAppear { Category.seedIfNeeded(in: context) }
         .onOpenURL { router.handle(url: $0) }
         .onChange(of: router.route) { _, route in
             switch route {
