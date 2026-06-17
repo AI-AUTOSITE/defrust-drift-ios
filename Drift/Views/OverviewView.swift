@@ -4,7 +4,7 @@
 //
 //  At-a-glance monthly total. Charts, "vs. last month", upcoming renewals and
 //  the cumulative-savings card arrive with the fuller Overview build-out; this
-//  step is the hero number plus an empty state.
+//  step is the hero number (now multi-currency) plus an empty state.
 //
 
 import SwiftData
@@ -20,10 +20,20 @@ struct OverviewView: View {
         subscriptions.filter { !$0.isPaused }
     }
 
-    /// NOTE: sums raw `monthlyCost` as USD for now. Multi-currency
-    /// normalization via `ExchangeRates.toUSD` lands with the full screen.
+    /// Sum of every active subscription, each converted from its own currency
+    /// into USD first so mixed-currency totals are correct (Part 1B §11.2).
     private var monthlyTotalUSD: Decimal {
-        activeSubscriptions.reduce(Decimal.zero) { $0 + $1.monthlyCost }
+        activeSubscriptions.reduce(Decimal.zero) { partial, subscription in
+            partial + ExchangeRates.convert(
+                subscription.monthlyCost,
+                from: subscription.currencyCode,
+                to: "USD"
+            )
+        }
+    }
+
+    private var yearlyTotalUSD: Decimal {
+        monthlyTotalUSD * 12
     }
 
     var body: some View {
@@ -54,6 +64,10 @@ struct OverviewView: View {
                     .font(DriftTypography.hero)
                     .minimumScaleFactor(0.6)
                     .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+
+                Text("\(yearlyTotalUSD.formatted(.currency(code: "USD"))) / year")
+                    .font(DriftTypography.caption)
+                    .foregroundStyle(DriftTheme.subtleText)
 
                 Text("\(activeSubscriptions.count) active")
                     .font(DriftTypography.caption)

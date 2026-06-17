@@ -1,0 +1,182 @@
+//
+//  AddSubscriptionView.swift
+//  Drift
+//
+//  The add / edit form (Part 2 §10.2). One screen serves both: pass `existing`
+//  to edit, or nothing to add. The user enters a per-cycle price; we normalize
+//  it to the stored monthly cost and derive the next renewal date with the
+//  BillingCycle helpers, so the rest of the app only ever sees a clean monthly
+//  figure and a future renewal date.
+//
+
+import SwiftData
+import SwiftUI
+
+struct AddSubscriptionView: View {
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
+
+    @Query(sort: \Category.sortOrder) private var categories: [Category]
+
+    /// The subscription being edited, or `nil` when adding a new one.
+    let existing: Subscription?
+
+    @State private var name = ""
+    @State private var amountText = ""
+    @State private var currencyCode = "USD"
+    @State private var cycle: BillingCycle = .monthly
+    @State private var customDays = 30
+    @State private var startDate = Date()
+    @State private var categoryID: PersistentIdentifier?
+
+    /// Bumped on a successful save so the success haptic fires.
+    @State private var saveTick = 0
+
+    init(existing: Subscription? = nil) {
+        self.existing = existing
+    }
+
+    private var isEditing: Bool { existing != nil }
+
+    /// Per-cycle amount the user typed, parsed leniently (accepts "," as ".").
+    private var amount: Decimal {
+        Decimal(string: amountText.replacingOccurrences(of: ",", with: ".")) ?? 0
+    }
+
+    private var resolvedCustomDays: Int? {
+        cycle == .custom ? customDays : nil
+    }
+
+    private var monthlyEquivalent: Decimal {
+        cycle.monthlyCost(forCycleAmount: amount, customCycleDays: resolvedCustomDays)
+    }
+
+    private var canSave: Bool {
+        !name.trimmingCharacters(in: .whitespaces).isEmpty && amount > 0
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Basics") {
+                    TextField("Name", text: $name)
+                        .textInputAutocapitalization(.words)
+                }
+
+                Section("Price") {
+                    TextField("0.00", text: $amountText)
+                        .keyboardType(.decimalPad)
+
+                    Picker("Currency", selection: $currencyCode) {
+                        ForEach(ExchangeRates.rates.keys.sorted(), id: \.self) { code in
+                            Text(code).tag(code)
+                        }
+                    }
+
+                    Picker("Billing cycle", selection: $cycle) {
+                        ForEach(BillingCycle.allCases) { option in
+                            Text(option.displayName).tag(option)
+                        }
+                    }
+
+                    if cycle == .custom {
+                        Stepper("Every \(customDays) days", value: $customDays, in: 1...365)
+                    }
+
+                    if amount > 0 {
+                        LabeledContent("Monthly equivalent") {
+                            Text(monthlyEquivalent, format: .currency(code: currencyCode))
+                                .foregroundStyle(DriftTheme.subtleText)
+                        }
+                    }
+                }
+
+                Section("Schedule") {
+                    DatePicker("Start date", selection: $startDate, displayedComponents: .date)
+                }
+
+                Section("Category") {
+                    Picker("Category", selection: $categoryID) {
+                        Text("None").tag(PersistentIdentifier?.none)
+                        ForEach(categories) { category in
+                            Text(category.name).tag(Optional(category.persistentModelID))
+                        }
+                    }
+                }
+            }
+            .navigationTitle(isEditing ? "Edit Subscription" : "Add Subscription")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { save() }
+                        .fontWeight(.semibold)
+                        .disabled(!canSave)
+                }
+            }
+            .driftHaptic(.subscriptionAdded, trigger: saveTick)
+            .onAppear(perform: populate)
+        }
+    }
+
+    /// Pre-fills the form when editing, reversing the stored monthly cost back
+    /// into the per-cycle amount the user originally entered.
+    private func populate() {
+        guard let existing else { return }
+        name = existing.name
+        currencyCode = existing.currencyCode
+        cycle = existing.billingCycle
+        customDays = existing.customCycleDays ?? 30
+        startDate = existing.startDate
+        categoryID = existing.category?.persistentModelID
+
+        let perCycle = existing.billingCycle.cycleAmount(
+            forMonthlyCost: existing.monthlyCost,
+            customCycleDays: existing.customCycleDays
+        )
+        amountText = Self.editableString(from: perCycle)
+    }
+
+    private func save() {
+        let monthly = cycle.monthlyCost(forCycleAmount: amount, customCycleDays: resolvedCustomDays)
+        let renewal = cycle.nextRenewal(onOrAfter: Date(), seed: startDate, customCycleDays: resolvedCustomDays)
+        let category = categories.first { $0.persistentModelID == categoryID }
+
+        let subscription = existing ?? Subscription()
+        subscription.name = name.trimmingCharacters(in: .whitespaces)
+        subscription.monthlyCost = monthly
+        subscription.currencyCode = currencyCode
+        subscription.billingCycle = cycle
+        subscription.customCycleDays = resolvedCustomDays
+        subscription.startDate = startDate
+        subscription.nextRenewalDate = renewal
+        subscription.category = category
+
+        // New subscriptions take their look from the chosen category so the list
+        // reads at a glance; editing leaves an existing icon/color untouched.
+        if existing == nil, let category {
+            subscription.iconName = category.iconSymbol
+            subscription.customColor = category.colorHex
+        }
+
+        if existing == nil {
+            context.insert(subscription)
+        }
+        try? context.save()
+        saveTick += 1
+        dismiss()
+    }
+
+    /// Renders a Decimal for the editable amount field without trailing-zero noise.
+    private static func editableString(from value: Decimal) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 4
+        formatter.usesGroupingSeparator = false
+        let number = NSDecimalNumber(decimal: value)
+        return formatter.string(from: number) ?? number.stringValue
+    }
+}
