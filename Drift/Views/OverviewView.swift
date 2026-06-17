@@ -2,9 +2,9 @@
 //  OverviewView.swift
 //  Drift
 //
-//  At-a-glance monthly total. Charts, "vs. last month", upcoming renewals and
-//  the cumulative-savings card arrive with the fuller Overview build-out; this
-//  step is the hero number (now multi-currency) plus an empty state.
+//  At-a-glance monthly state. Builds out in steps: the multi-currency hero
+//  total plus, now, an "Upcoming renewals" rail showing what renews in the
+//  next 30 days. Charts, "vs. last month" and the Pro savings card come later.
 //
 
 import SwiftData
@@ -36,6 +36,17 @@ struct OverviewView: View {
         monthlyTotalUSD * 12
     }
 
+    /// Active subscriptions renewing within the next 30 days, soonest first.
+    private var upcomingRenewals: [Subscription] {
+        let now = Date()
+        guard let limit = Calendar.current.date(byAdding: .day, value: 30, to: now) else {
+            return []
+        }
+        return activeSubscriptions
+            .filter { $0.nextRenewalDate >= now && $0.nextRenewalDate <= limit }
+            .sorted { $0.nextRenewalDate < $1.nextRenewalDate }
+    }
+
     var body: some View {
         NavigationStack {
             Group {
@@ -46,36 +57,100 @@ struct OverviewView: View {
                         description: Text("Add subscriptions to see your monthly total here.")
                     )
                 } else {
-                    total
+                    content
                 }
             }
             .navigationTitle("Overview")
         }
     }
 
-    private var total: some View {
+    private var content: some View {
         ScrollView {
-            VStack(spacing: DriftSpacing.s8) {
-                Text("This month")
-                    .font(.subheadline)
-                    .foregroundStyle(DriftTheme.subtleText)
-
-                Text(monthlyTotalUSD, format: .currency(code: "USD"))
-                    .font(DriftTypography.hero)
-                    .minimumScaleFactor(0.6)
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-
-                Text("\(yearlyTotalUSD.formatted(.currency(code: "USD"))) / year")
-                    .font(DriftTypography.caption)
-                    .foregroundStyle(DriftTheme.subtleText)
-
-                Text("\(activeSubscriptions.count) active")
-                    .font(DriftTypography.caption)
-                    .foregroundStyle(DriftTheme.subtleText)
+            VStack(alignment: .leading, spacing: DriftSpacing.s32) {
+                hero
+                if !upcomingRenewals.isEmpty {
+                    upcomingSection
+                }
             }
-            .frame(maxWidth: .infinity)
             .padding(.vertical, DriftSpacing.s24)
-            .padding(.horizontal, DriftSpacing.s16)
         }
+    }
+
+    private var hero: some View {
+        VStack(spacing: DriftSpacing.s8) {
+            Text("This month")
+                .font(.subheadline)
+                .foregroundStyle(DriftTheme.subtleText)
+
+            Text(monthlyTotalUSD, format: .currency(code: "USD"))
+                .font(DriftTypography.hero)
+                .minimumScaleFactor(0.6)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+
+            Text("\(yearlyTotalUSD.formatted(.currency(code: "USD"))) / year")
+                .font(DriftTypography.caption)
+                .foregroundStyle(DriftTheme.subtleText)
+
+            Text("\(activeSubscriptions.count) active")
+                .font(DriftTypography.caption)
+                .foregroundStyle(DriftTheme.subtleText)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, DriftSpacing.s16)
+    }
+
+    private var upcomingSection: some View {
+        VStack(alignment: .leading, spacing: DriftSpacing.s12) {
+            Text("Upcoming renewals")
+                .font(DriftTypography.sectionTitle)
+                .padding(.horizontal, DriftSpacing.s16)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: DriftSpacing.s12) {
+                    ForEach(upcomingRenewals, id: \.persistentModelID) { subscription in
+                        RenewalChip(subscription: subscription)
+                    }
+                }
+                .padding(.horizontal, DriftSpacing.s16)
+            }
+        }
+    }
+}
+
+private struct RenewalChip: View {
+    let subscription: Subscription
+
+    /// The amount actually billed at the next renewal (full cycle price, in the
+    /// subscription's own currency) — not the normalized monthly figure, so a
+    /// yearly plan shows what really lands on the card.
+    private var renewalCharge: Decimal {
+        subscription.billingCycle.cycleAmount(
+            forMonthlyCost: subscription.monthlyCost,
+            customCycleDays: subscription.customCycleDays
+        )
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: DriftSpacing.s4) {
+            Image(systemName: subscription.iconName)
+                .font(.title3)
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(Color(hex: subscription.customColor))
+                .padding(.bottom, DriftSpacing.s4)
+
+            Text(subscription.name)
+                .font(.subheadline.weight(.medium))
+                .lineLimit(1)
+
+            Text(subscription.nextRenewalDate.formatted(.dateTime.month().day()))
+                .font(DriftTypography.caption)
+                .foregroundStyle(DriftTheme.subtleText)
+
+            Text(renewalCharge, format: .currency(code: subscription.currencyCode))
+                .font(DriftTypography.amount)
+        }
+        .padding(DriftSpacing.s12)
+        .frame(width: 132, alignment: .leading)
+        .background(DriftTheme.neutralFill, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
