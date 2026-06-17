@@ -2,8 +2,9 @@
 //  SubscriptionsView.swift
 //  Drift
 //
-//  Lists the user's subscriptions and is the place to add, edit and remove
-//  them. Deletion follows the anti-dark-pattern rule (Part 2 §10.2): no scary
+//  Lists the user's subscriptions and is the place to add, open and remove
+//  them. Tapping a row pushes the detail screen (edit lives there now).
+//  Deletion follows the anti-dark-pattern rule (Part 2 §10.2): no scary
 //  confirmation dialog — the row disappears immediately and a brief Undo banner
 //  lets the user take it back. The delete is only committed once that window
 //  passes.
@@ -18,7 +19,6 @@ struct SubscriptionsView: View {
     private var subscriptions: [Subscription]
 
     @State private var isAdding = false
-    @State private var editingSubscription: Subscription?
     @State private var pendingDelete: Subscription?
     @State private var deleteTick = 0
 
@@ -42,6 +42,11 @@ struct SubscriptionsView: View {
                 }
             }
             .navigationTitle("Subscriptions")
+            .navigationDestination(for: Subscription.self) { subscription in
+                SubscriptionDetailView(subscription: subscription) { target in
+                    requestDelete(target)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -55,9 +60,6 @@ struct SubscriptionsView: View {
         }
         .sheet(isPresented: $isAdding) {
             AddSubscriptionView()
-        }
-        .sheet(item: $editingSubscription) { subscription in
-            AddSubscriptionView(existing: subscription)
         }
         .driftHaptic(.subscriptionDeleted, trigger: deleteTick)
         .task(id: pendingDelete?.persistentModelID) {
@@ -73,12 +75,9 @@ struct SubscriptionsView: View {
     private var list: some View {
         List {
             ForEach(visibleSubscriptions, id: \.persistentModelID) { subscription in
-                Button {
-                    editingSubscription = subscription
-                } label: {
+                NavigationLink(value: subscription) {
                     SubscriptionRow(subscription: subscription)
                 }
-                .buttonStyle(.plain)
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button(role: .destructive) {
                         requestDelete(subscription)

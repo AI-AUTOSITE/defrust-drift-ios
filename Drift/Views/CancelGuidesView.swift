@@ -69,7 +69,9 @@ private struct CancelGuideRow: View {
     }
 }
 
-private struct CancellationGuideDetail: View {
+/// Step-by-step guide screen. Internal (not private) so the subscription
+/// detail screen can reuse it when a subscription matches a known service.
+struct CancellationGuideDetail: View {
     let guide: CancellationGuide
 
     var body: some View {
