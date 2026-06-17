@@ -1,238 +1,80 @@
 //
-//  AddSubscriptionView.swift
+//  ServicePickerView.swift
 //  Drift
 //
-//  The add / edit form (Part 2 §10.2). One screen serves both: pass `existing`
-//  to edit, or nothing to add. The user enters a per-cycle price; we normalize
-//  it to the stored monthly cost and derive the next renewal date with the
-//  BillingCycle helpers. Picking a known service links it (serviceID) and
-//  auto-fills the name and category, which also drives the row icon/color.
+//  A searchable picker over the 50 bundled services. Choosing one links the
+//  subscription to a known service (its serviceID), which lets the detail
+//  screen show the real cancellation guide and auto-fills name + category.
+//  The friction badge is shown here too, so the trade-off is visible up front.
 //
 
-import SwiftData
+import Foundation
 import SwiftUI
 
-struct AddSubscriptionView: View {
-    @Environment(\.modelContext) private var context
+struct ServicePickerView: View {
+    /// Called with the chosen guide, or `nil` for "Custom" (no linked service).
+    let onSelect: (CancellationGuide?) -> Void
+
     @Environment(\.dismiss) private var dismiss
+    @State private var store = CancellationGuideStore()
+    @State private var query = ""
 
-    @Query(sort: \Category.sortOrder) private var categories: [Category]
-
-    /// The subscription being edited, or `nil` when adding a new one.
-    let existing: Subscription?
-
-    @State private var name = ""
-    @State private var amountText = ""
-    @State private var currencyCode = "USD"
-    @State private var cycle: BillingCycle = .monthly
-    @State private var customDays = 30
-    @State private var startDate = Date()
-    @State private var categoryID: PersistentIdentifier?
-    @State private var serviceID: String?
-
-    @State private var guideStore = CancellationGuideStore()
-    @State private var isPickingService = false
-
-    /// Bumped on a successful save so the success haptic fires.
-    @State private var saveTick = 0
-
-    init(existing: Subscription? = nil) {
-        self.existing = existing
-    }
-
-    private var isEditing: Bool { existing != nil }
-
-    /// Per-cycle amount the user typed, parsed leniently (accepts "," as ".").
-    private var amount: Decimal {
-        Decimal(string: amountText.replacingOccurrences(of: ",", with: ".")) ?? 0
-    }
-
-    private var resolvedCustomDays: Int? {
-        cycle == .custom ? customDays : nil
-    }
-
-    private var monthlyEquivalent: Decimal {
-        cycle.monthlyCost(forCycleAmount: amount, customCycleDays: resolvedCustomDays)
-    }
-
-    private var canSave: Bool {
-        !name.trimmingCharacters(in: .whitespaces).isEmpty && amount > 0
-    }
-
-    /// Display name of the currently linked service, if any.
-    private var linkedServiceName: String? {
-        guard let serviceID else { return nil }
-        return guideStore.guide(for: serviceID)?.serviceName
+    private var results: [CancellationGuide] {
+        let sorted = store.allGuides.sorted {
+            $0.serviceName.localizedCaseInsensitiveCompare($1.serviceName) == .orderedAscending
+        }
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return sorted }
+        return sorted.filter { $0.serviceName.localizedCaseInsensitiveContains(trimmed) }
     }
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Service") {
+            List {
+                Section {
                     Button {
-                        isPickingService = true
+                        onSelect(nil)
+                        dismiss()
                     } label: {
-                        HStack {
-                            Text("Service")
-                            Spacer()
-                            Text(linkedServiceName ?? "Custom")
-                                .foregroundStyle(DriftTheme.subtleText)
-                            Image(systemName: "chevron.right")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.tertiary)
-                        }
+                        Label("Custom (no linked service)", systemImage: "square.dashed")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }
 
-                Section("Basics") {
-                    TextField("Name", text: $name)
-                        .textInputAutocapitalization(.words)
-                }
-
-                Section("Price") {
-                    TextField("0.00", text: $amountText)
-                        .keyboardType(.decimalPad)
-
-                    Picker("Currency", selection: $currencyCode) {
-                        ForEach(ExchangeRates.rates.keys.sorted(), id: \.self) { code in
-                            Text(code).tag(code)
+                Section {
+                    ForEach(results) { guide in
+                        Button {
+                            onSelect(guide)
+                            dismiss()
+                        } label: {
+                            HStack(spacing: DriftSpacing.s12) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(guide.serviceName)
+                                        .font(.body)
+                                    Text(guide.category)
+                                        .font(.footnote)
+                                        .foregroundStyle(DriftTheme.subtleText)
+                                }
+                                Spacer(minLength: DriftSpacing.s8)
+                                DarkPatternBadge(score: guide.darkPatternScore)
+                            }
+                            .contentShape(Rectangle())
                         }
-                    }
-
-                    Picker("Billing cycle", selection: $cycle) {
-                        ForEach(BillingCycle.allCases) { option in
-                            Text(option.displayName).tag(option)
-                        }
-                    }
-
-                    if cycle == .custom {
-                        Stepper("Every \(customDays) days", value: $customDays, in: 1...365)
-                    }
-
-                    if amount > 0 {
-                        LabeledContent("Monthly equivalent") {
-                            Text(monthlyEquivalent, format: .currency(code: currencyCode))
-                                .foregroundStyle(DriftTheme.subtleText)
-                        }
-                    }
-                }
-
-                Section("Schedule") {
-                    DatePicker("Start date", selection: $startDate, displayedComponents: .date)
-                }
-
-                Section("Category") {
-                    Picker("Category", selection: $categoryID) {
-                        Text("None").tag(PersistentIdentifier?.none)
-                        ForEach(categories) { category in
-                            Text(category.name).tag(Optional(category.persistentModelID))
-                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }
-            .navigationTitle(isEditing ? "Edit Subscription" : "Add Subscription")
+            .listStyle(.insetGrouped)
+            .navigationTitle("Choose Service")
             .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $query, prompt: "Search services")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { save() }
-                        .fontWeight(.semibold)
-                        .disabled(!canSave)
-                }
             }
-            .sheet(isPresented: $isPickingService) {
-                ServicePickerView { applyService($0) }
-            }
-            .driftHaptic(.subscriptionAdded, trigger: saveTick)
-            .onAppear(perform: populate)
         }
-    }
-
-    /// Applies a service chosen from the picker: links it and auto-fills the
-    /// name and best-matching category. "Custom" (nil) only clears the link.
-    private func applyService(_ guide: CancellationGuide?) {
-        serviceID = guide?.id
-        guard let guide else { return }
-        name = guide.serviceName
-        if let mapped = matchedCategory(for: guide.category) {
-            categoryID = mapped.persistentModelID
-        }
-    }
-
-    /// Maps a guide's category string to a seeded Category by name, falling back
-    /// to "Other" when there's no exact match (e.g. the guides' "Family").
-    private func matchedCategory(for guideCategory: String) -> Category? {
-        if let exact = categories.first(where: {
-            $0.name.localizedCaseInsensitiveCompare(guideCategory) == .orderedSame
-        }) {
-            return exact
-        }
-        return categories.first {
-            $0.name.localizedCaseInsensitiveCompare("Other") == .orderedSame
-        }
-    }
-
-    /// Pre-fills the form when editing, reversing the stored monthly cost back
-    /// into the per-cycle amount the user originally entered.
-    private func populate() {
-        guard let existing else { return }
-        name = existing.name
-        currencyCode = existing.currencyCode
-        cycle = existing.billingCycle
-        customDays = existing.customCycleDays ?? 30
-        startDate = existing.startDate
-        categoryID = existing.category?.persistentModelID
-        serviceID = existing.serviceID
-
-        let perCycle = existing.billingCycle.cycleAmount(
-            forMonthlyCost: existing.monthlyCost,
-            customCycleDays: existing.customCycleDays
-        )
-        amountText = Self.editableString(from: perCycle)
-    }
-
-    private func save() {
-        let monthly = cycle.monthlyCost(forCycleAmount: amount, customCycleDays: resolvedCustomDays)
-        let renewal = cycle.nextRenewal(onOrAfter: Date(), seed: startDate, customCycleDays: resolvedCustomDays)
-        let category = categories.first { $0.persistentModelID == categoryID }
-
-        let subscription = existing ?? Subscription()
-        subscription.name = name.trimmingCharacters(in: .whitespaces)
-        subscription.monthlyCost = monthly
-        subscription.currencyCode = currencyCode
-        subscription.billingCycle = cycle
-        subscription.customCycleDays = resolvedCustomDays
-        subscription.startDate = startDate
-        subscription.nextRenewalDate = renewal
-        subscription.category = category
-        subscription.serviceID = serviceID
-
-        // New subscriptions take their look from the chosen category so the list
-        // reads at a glance; editing leaves an existing icon/color untouched.
-        if existing == nil, let category {
-            subscription.iconName = category.iconSymbol
-            subscription.customColor = category.colorHex
-        }
-
-        if existing == nil {
-            context.insert(subscription)
-        }
-        try? context.save()
-        saveTick += 1
-        dismiss()
-    }
-
-    /// Renders a Decimal for the editable amount field without trailing-zero noise.
-    private static func editableString(from value: Decimal) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 4
-        formatter.usesGroupingSeparator = false
-        let number = NSDecimalNumber(decimal: value)
-        return formatter.string(from: number) ?? number.stringValue
     }
 }
