@@ -5,8 +5,8 @@
 //  The add / edit form (Part 2 §10.2). One screen serves both: pass `existing`
 //  to edit, or nothing to add. The user enters a per-cycle price; we normalize
 //  it to the stored monthly cost and derive the next renewal date with the
-//  BillingCycle helpers, so the rest of the app only ever sees a clean monthly
-//  figure and a future renewal date.
+//  BillingCycle helpers. Picking a known service links it (serviceID) and
+//  auto-fills the name and category, which also drives the row icon/color.
 //
 
 import SwiftData
@@ -28,6 +28,10 @@ struct AddSubscriptionView: View {
     @State private var customDays = 30
     @State private var startDate = Date()
     @State private var categoryID: PersistentIdentifier?
+    @State private var serviceID: String?
+
+    @State private var guideStore = CancellationGuideStore()
+    @State private var isPickingService = false
 
     /// Bumped on a successful save so the success haptic fires.
     @State private var saveTick = 0
@@ -55,9 +59,32 @@ struct AddSubscriptionView: View {
         !name.trimmingCharacters(in: .whitespaces).isEmpty && amount > 0
     }
 
+    /// Display name of the currently linked service, if any.
+    private var linkedServiceName: String? {
+        guard let serviceID else { return nil }
+        return guideStore.guide(for: serviceID)?.serviceName
+    }
+
     var body: some View {
         NavigationStack {
             Form {
+                Section("Service") {
+                    Button {
+                        isPickingService = true
+                    } label: {
+                        HStack {
+                            Text("Service")
+                            Spacer()
+                            Text(linkedServiceName ?? "Custom")
+                                .foregroundStyle(DriftTheme.subtleText)
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+
                 Section("Basics") {
                     TextField("Name", text: $name)
                         .textInputAutocapitalization(.words)
@@ -116,8 +143,35 @@ struct AddSubscriptionView: View {
                         .disabled(!canSave)
                 }
             }
+            .sheet(isPresented: $isPickingService) {
+                ServicePickerView { applyService($0) }
+            }
             .driftHaptic(.subscriptionAdded, trigger: saveTick)
             .onAppear(perform: populate)
+        }
+    }
+
+    /// Applies a service chosen from the picker: links it and auto-fills the
+    /// name and best-matching category. "Custom" (nil) only clears the link.
+    private func applyService(_ guide: CancellationGuide?) {
+        serviceID = guide?.id
+        guard let guide else { return }
+        name = guide.serviceName
+        if let mapped = matchedCategory(for: guide.category) {
+            categoryID = mapped.persistentModelID
+        }
+    }
+
+    /// Maps a guide's category string to a seeded Category by name, falling back
+    /// to "Other" when there's no exact match (e.g. the guides' "Family").
+    private func matchedCategory(for guideCategory: String) -> Category? {
+        if let exact = categories.first(where: {
+            $0.name.localizedCaseInsensitiveCompare(guideCategory) == .orderedSame
+        }) {
+            return exact
+        }
+        return categories.first {
+            $0.name.localizedCaseInsensitiveCompare("Other") == .orderedSame
         }
     }
 
@@ -131,6 +185,7 @@ struct AddSubscriptionView: View {
         customDays = existing.customCycleDays ?? 30
         startDate = existing.startDate
         categoryID = existing.category?.persistentModelID
+        serviceID = existing.serviceID
 
         let perCycle = existing.billingCycle.cycleAmount(
             forMonthlyCost: existing.monthlyCost,
@@ -153,6 +208,7 @@ struct AddSubscriptionView: View {
         subscription.startDate = startDate
         subscription.nextRenewalDate = renewal
         subscription.category = category
+        subscription.serviceID = serviceID
 
         // New subscriptions take their look from the chosen category so the list
         // reads at a glance; editing leaves an existing icon/color untouched.
