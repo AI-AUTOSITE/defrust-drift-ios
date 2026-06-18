@@ -12,6 +12,7 @@
 //  (it no-ops once any category exists), so calling it on appear is safe.
 //
 
+import Observation
 import SwiftData
 import SwiftUI
 
@@ -19,6 +20,7 @@ struct RootView: View {
     @Environment(\.modelContext) private var context
     @State private var router = DriftDeepLinkRouter.shared
     @State private var selection: AppTab = .overview
+    @State private var deletionState = DeletionState()
 
     var body: some View {
         TabView(selection: $selection) {
@@ -35,6 +37,7 @@ struct RootView: View {
                 .tag(AppTab.cancel)
         }
         .tint(DriftTheme.accent)
+        .environment(deletionState)
         .modifier(GlassTabBarBehavior())
         .onAppear { Category.seedIfNeeded(in: context) }
         .onOpenURL { router.handle(url: $0) }
@@ -69,4 +72,13 @@ private struct GlassTabBarBehavior: ViewModifier {
             content
         }
     }
+}
+
+/// Tracks the subscription currently in its swipe-delete undo window. Shared
+/// across tabs so the Overview total can drop it immediately and restore it on
+/// undo, staying in sync with the Subscriptions list (the delete itself is only
+/// committed once the window elapses).
+@Observable
+final class DeletionState {
+    var pendingID: PersistentIdentifier?
 }

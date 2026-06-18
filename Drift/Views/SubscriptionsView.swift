@@ -15,6 +15,7 @@ import SwiftUI
 
 struct SubscriptionsView: View {
     @Environment(\.modelContext) private var context
+    @Environment(DeletionState.self) private var deletionState
     @Query(sort: \Subscription.name)
     private var subscriptions: [Subscription]
 
@@ -78,6 +79,15 @@ struct SubscriptionsView: View {
                 NavigationLink(value: subscription) {
                     SubscriptionRow(subscription: subscription)
                 }
+                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    Button {
+                        togglePause(subscription)
+                    } label: {
+                        Label(subscription.isPaused ? "Resume" : "Pause",
+                              systemImage: subscription.isPaused ? "play.fill" : "pause.fill")
+                    }
+                    .tint(subscription.isPaused ? .green : .orange)
+                }
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button(role: .destructive) {
                         requestDelete(subscription)
@@ -115,10 +125,13 @@ struct SubscriptionsView: View {
         commitPendingDelete()
         deleteTick += 1
         withAnimation { pendingDelete = subscription }
+        // Share it so the Overview total drops this subscription right away.
+        deletionState.pendingID = subscription.persistentModelID
     }
 
     private func undoDelete() {
         withAnimation { pendingDelete = nil }
+        deletionState.pendingID = nil
     }
 
     private func commitPendingDelete() {
@@ -126,6 +139,17 @@ struct SubscriptionsView: View {
         context.delete(target)
         try? context.save()
         pendingDelete = nil
+        deletionState.pendingID = nil
+    }
+
+    private func togglePause(_ subscription: Subscription) {
+        withAnimation {
+            subscription.isPaused.toggle()
+            if !subscription.isPaused {
+                subscription.pausedUntil = nil
+            }
+        }
+        try? context.save()
     }
 }
 
@@ -143,9 +167,15 @@ private struct SubscriptionRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(subscription.name)
                     .font(.body)
-                Text("Renews \(subscription.nextRenewalDate.formatted(.dateTime.month().day()))")
-                    .font(.footnote)
-                    .foregroundStyle(DriftTheme.subtleText)
+                if subscription.isPaused {
+                    Text("Paused")
+                        .font(.footnote)
+                        .foregroundStyle(DriftTheme.subtleText)
+                } else {
+                    Text("Renews \(subscription.nextRenewalDate.formatted(.dateTime.month().day()))")
+                        .font(.footnote)
+                        .foregroundStyle(DriftTheme.subtleText)
+                }
             }
 
             Spacer(minLength: DriftSpacing.s8)
@@ -155,5 +185,6 @@ private struct SubscriptionRow: View {
                 .font(DriftTypography.amount)
         }
         .padding(.vertical, DriftSpacing.s4)
+        .opacity(subscription.isPaused ? 0.55 : 1)
     }
 }

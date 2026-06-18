@@ -2,38 +2,55 @@
 //  OverviewView.swift
 //  Drift
 //
-//  At-a-glance monthly state. Builds out in steps: the multi-currency hero
-//  total plus, now, an "Upcoming renewals" rail showing what renews in the
-//  next 30 days. Charts, "vs. last month" and the Pro savings card come later.
+//  At-a-glance monthly state. The hero total is converted into the user's
+//  preferred display currency (set in Settings, reached via the gearshape);
+//  individual subscriptions still show the amount actually billed, so the
+//  per-item figures stay exact. An "Upcoming renewals" rail shows what renews
+//  in the next 30 days. Charts, "vs. last month" and the Pro savings card
+//  come later.
 //
 
 import SwiftData
 import SwiftUI
 
 struct OverviewView: View {
+    @Environment(DeletionState.self) private var deletionState
     @Query(sort: \Subscription.nextRenewalDate)
     private var subscriptions: [Subscription]
 
-    /// Paused subscriptions are excluded. Filtered in memory to sidestep
-    /// SwiftData predicate quirks (and the set is tiny).
+    /// Currency the hero total is shown in. Device-local (UserDefaults), shared
+    /// with Settings; defaults to USD so the total reads exactly as before until
+    /// the user changes it.
+    @AppStorage("preferredCurrencyCode") private var preferredCurrencyCode = "USD"
+
+    @State private var isShowingSettings = false
+
+    /// Paused subscriptions are excluded, as is any subscription currently in
+    /// its swipe-delete undo window (so the total drops immediately, then comes
+    /// back if the user taps Undo). Filtered in memory to sidestep SwiftData
+    /// predicate quirks (and the set is tiny).
     private var activeSubscriptions: [Subscription] {
-        subscriptions.filter { !$0.isPaused }
+        subscriptions.filter {
+            !$0.isPaused && $0.persistentModelID != deletionState.pendingID
+        }
     }
 
     /// Sum of every active subscription, each converted from its own currency
-    /// into USD first so mixed-currency totals are correct (Part 1B §11.2).
-    private var monthlyTotalUSD: Decimal {
+    /// into the preferred display currency so mixed-currency totals are correct.
+    /// Only this aggregate is converted — individual rows keep their own billed
+    /// currency (Part 1B §11.2).
+    private var monthlyTotal: Decimal {
         activeSubscriptions.reduce(Decimal.zero) { partial, subscription in
             partial + ExchangeRates.convert(
                 subscription.monthlyCost,
                 from: subscription.currencyCode,
-                to: "USD"
+                to: preferredCurrencyCode
             )
         }
     }
 
-    private var yearlyTotalUSD: Decimal {
-        monthlyTotalUSD * 12
+    private var yearlyTotal: Decimal {
+        monthlyTotal * 12
     }
 
     /// Active subscriptions renewing within the next 30 days, soonest first.
@@ -61,6 +78,18 @@ struct OverviewView: View {
                 }
             }
             .navigationTitle("Overview")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isShowingSettings = true
+                    } label: {
+                        Label("Settings", systemImage: "gearshape")
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingSettings) {
+                SettingsView()
+            }
         }
     }
 
@@ -82,12 +111,12 @@ struct OverviewView: View {
                 .font(.subheadline)
                 .foregroundStyle(DriftTheme.subtleText)
 
-            Text(monthlyTotalUSD, format: .currency(code: "USD"))
+            Text(monthlyTotal, format: .currency(code: preferredCurrencyCode))
                 .font(DriftTypography.hero)
                 .minimumScaleFactor(0.6)
                 .dynamicTypeSize(...DynamicTypeSize.accessibility2)
 
-            Text("\(yearlyTotalUSD.formatted(.currency(code: "USD"))) / year")
+            Text("\(yearlyTotal.formatted(.currency(code: preferredCurrencyCode))) / year")
                 .font(DriftTypography.caption)
                 .foregroundStyle(DriftTheme.subtleText)
 

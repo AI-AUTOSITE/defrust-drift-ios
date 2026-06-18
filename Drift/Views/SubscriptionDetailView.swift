@@ -18,6 +18,7 @@ struct SubscriptionDetailView: View {
     let onDelete: (Subscription) -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
     @State private var guideStore = CancellationGuideStore()
     @State private var isEditing = false
 
@@ -86,6 +87,15 @@ struct SubscriptionDetailView: View {
             }
 
             Section {
+                Button {
+                    togglePause()
+                } label: {
+                    Label(subscription.isPaused ? "Resume Subscription" : "Pause Subscription",
+                          systemImage: subscription.isPaused ? "play.circle" : "pause.circle")
+                }
+            }
+
+            Section {
                 Button(role: .destructive) {
                     onDelete(subscription)
                     dismiss()
@@ -116,6 +126,14 @@ struct SubscriptionDetailView: View {
         }
     }
 
+    private func togglePause() {
+        subscription.isPaused.toggle()
+        if !subscription.isPaused {
+            subscription.pausedUntil = nil
+        }
+        try? context.save()
+    }
+
     private var header: some View {
         HStack(spacing: DriftSpacing.s16) {
             Image(systemName: subscription.iconName)
@@ -133,6 +151,11 @@ struct SubscriptionDetailView: View {
                     Text(category.name)
                         .font(.footnote)
                         .foregroundStyle(DriftTheme.subtleText)
+                }
+                if subscription.isPaused {
+                    Text("Paused")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.orange)
                 }
             }
 
