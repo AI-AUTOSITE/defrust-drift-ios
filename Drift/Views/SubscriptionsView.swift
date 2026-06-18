@@ -7,7 +7,8 @@
 //  Deletion follows the anti-dark-pattern rule (Part 2 §10.2): no scary
 //  confirmation dialog — the row disappears immediately and a brief Undo banner
 //  lets the user take it back. The delete is only committed once that window
-//  passes.
+//  passes. Adding is gated by the free tier: at the limit, the "+" opens the
+//  paywall instead of an empty form.
 //
 
 import SwiftData
@@ -16,10 +17,12 @@ import SwiftUI
 struct SubscriptionsView: View {
     @Environment(\.modelContext) private var context
     @Environment(DeletionState.self) private var deletionState
+    @Environment(DriftStore.self) private var store
     @Query(sort: \Subscription.name)
     private var subscriptions: [Subscription]
 
     @State private var isAdding = false
+    @State private var isShowingPaywall = false
     @State private var pendingDelete: Subscription?
     @State private var deleteTick = 0
 
@@ -51,7 +54,7 @@ struct SubscriptionsView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
-                        isAdding = true
+                        requestAdd()
                     } label: {
                         Label("Add Subscription", systemImage: "plus")
                     }
@@ -61,6 +64,9 @@ struct SubscriptionsView: View {
         }
         .sheet(isPresented: $isAdding) {
             AddSubscriptionView()
+        }
+        .sheet(isPresented: $isShowingPaywall) {
+            PaywallView()
         }
         .driftHaptic(.subscriptionDeleted, trigger: deleteTick)
         .task(id: pendingDelete?.persistentModelID) {
@@ -117,6 +123,15 @@ struct SubscriptionsView: View {
             .padding(.horizontal, DriftSpacing.s16)
             .padding(.bottom, DriftSpacing.s8)
             .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+    }
+
+    /// Opens the Add form, or the paywall when the free tier is full.
+    private func requestAdd() {
+        if store.canAddSubscription(currentCount: subscriptions.count) {
+            isAdding = true
+        } else {
+            isShowingPaywall = true
         }
     }
 

@@ -29,8 +29,21 @@ final class DriftStore {
         purchasedProductIDs.contains("com.defrust.drift.pro.lifetime")
     }
 
-    /// Free tier's maximum subscription count.
-    static let freeTierLimit: Int = 5
+    /// Free tier's maximum subscription count; Pro removes the cap.
+    /// Monetization spec: the free tier covers ten subscriptions.
+    nonisolated static let freeTierLimit = 10
+
+    /// Pure gate check, kept free of StoreKit so it is testable anywhere: a free
+    /// user may hold up to `freeTierLimit` subscriptions; Pro is never capped.
+    nonisolated static func canAdd(currentCount: Int, isPro: Bool) -> Bool {
+        isPro || currentCount < freeTierLimit
+    }
+
+    /// Whether another subscription may be added, given how many already exist.
+    /// Editing an existing subscription should not be gated by this.
+    func canAddSubscription(currentCount: Int) -> Bool {
+        Self.canAdd(currentCount: currentCount, isPro: isPro)
+    }
 
     private var transactionListener: Task<Void, Never>?
 

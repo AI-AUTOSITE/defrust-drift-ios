@@ -8,6 +8,9 @@
 //  BillingCycle helpers. Picking a known service links it (serviceID) and
 //  auto-fills the name and category, which also drives the row icon/color.
 //
+//  Adding a new subscription is gated by the free tier (the backstop for any
+//  entry point); editing an existing one is never gated.
+//
 
 import SwiftData
 import SwiftUI
@@ -15,8 +18,10 @@ import SwiftUI
 struct AddSubscriptionView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @Environment(DriftStore.self) private var store
 
     @Query(sort: \Category.sortOrder) private var categories: [Category]
+    @Query private var allSubscriptions: [Subscription]
 
     /// The subscription being edited, or `nil` when adding a new one.
     let existing: Subscription?
@@ -32,6 +37,7 @@ struct AddSubscriptionView: View {
 
     @State private var guideStore = CancellationGuideStore()
     @State private var isPickingService = false
+    @State private var isShowingPaywall = false
 
     /// Bumped on a successful save so the success haptic fires.
     @State private var saveTick = 0
@@ -138,13 +144,16 @@ struct AddSubscriptionView: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { save() }
+                    Button("Save") { attemptSave() }
                         .fontWeight(.semibold)
                         .disabled(!canSave)
                 }
             }
             .sheet(isPresented: $isPickingService) {
                 ServicePickerView { applyService($0) }
+            }
+            .sheet(isPresented: $isShowingPaywall) {
+                PaywallView()
             }
             .driftHaptic(.subscriptionAdded, trigger: saveTick)
             .onAppear(perform: populate)
@@ -192,6 +201,17 @@ struct AddSubscriptionView: View {
             customCycleDays: existing.customCycleDays
         )
         amountText = Self.editableString(from: perCycle)
+    }
+
+    /// Adding a new subscription is gated by the free tier; editing never is.
+    /// The "+" entry checks this too, so this is the backstop for any other path
+    /// (a future Siri / deep-link add must not slip past the limit).
+    private func attemptSave() {
+        if existing == nil && !store.canAddSubscription(currentCount: allSubscriptions.count) {
+            isShowingPaywall = true
+        } else {
+            save()
+        }
     }
 
     private func save() {
