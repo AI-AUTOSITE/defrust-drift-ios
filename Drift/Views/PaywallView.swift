@@ -6,10 +6,10 @@
 //  states the value plainly and lets the user buy, restore, or just leave — no
 //  countdowns, no fake scarcity, no nagging (Part 2 anti-dark-pattern rule).
 //
-//  ⚠️ FEATURE LIST: `proFeatures` must list ONLY features that actually ship.
+//  ⚠️ FEATURE LIST: `proFeatures` lists ONLY what actually ships in v1.0.
 //  Promising unbuilt features breaks the "honest" brand promise and risks App
-//  Review rejection. Reconcile this array with the real feature set before
-//  TestFlight / launch — it is the one thing here that needs trimming.
+//  Review rejection. Add export / Live Activity / Watch / receipt parsing back
+//  only once they actually ship.
 //
 
 import StoreKit
@@ -23,13 +23,12 @@ struct PaywallView: View {
 
     private let productID = "com.defrust.drift.pro.lifetime"
 
-    /// ⚠️ Keep this honest — list only what is actually in the build at launch.
+    /// v1.0 Pro features — committed to ship by launch. Add more only once
+    /// they are actually built (see the warning above).
     private let proFeatures = [
         "Track unlimited subscriptions",
         "Reminders 3, 7, and 14 days ahead",
-        "Home screen widget",
-        "Export to CSV, PDF, and OFX",
-        "Automatic multi-currency conversion"
+        "Home screen widget"
     ]
 
     private var proProduct: Product? {
