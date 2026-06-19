@@ -38,7 +38,3 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           BETA_CHANGELOG: "Internal CI build"
-          # The altool bundled with Xcode 26 fails to upload (".p8 isn't in the
-          # correct format (259)"). Forcing the older altool implementation is the
-          # known working workaround (fastlane issue #29698, Apple DevForums 799015).
-          DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS: "--use-old-altool"
