@@ -1,0 +1,7 @@
+app_identifier("com.defrust.drift")
+team_id(ENV["APP_STORE_TEAM_ID"])
+itc_team_id(ENV["APP_STORE_TEAM_ID"])
+
+# apple_id is NOT needed when authenticating with the App Store Connect API key
+# (configured in the Fastfile). Left here only for reference:
+# apple_id(ENV["FASTLANE_APPLE_ID"])

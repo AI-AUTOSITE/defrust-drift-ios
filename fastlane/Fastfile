@@ -1,0 +1,66 @@
+default_platform(:ios)
+
+platform :ios do
+  before_all do
+    setup_ci if ENV["CI"]
+  end
+
+  desc "Run unit tests via the DriftUnit test plan (StoreKit suite skipped, as on CI)"
+  lane :test do
+    run_tests(
+      project: "Drift.xcodeproj",
+      scheme: "Drift",
+      testplan: "DriftUnit",
+      skip_testing: ["DriftTests/DriftStorePurchaseTests"],
+      code_coverage: true,
+      result_bundle: true
+    )
+  end
+
+  desc "Build and upload a build to TestFlight (internal testers only)"
+  lane :beta do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_KEY_CONTENT"], # base64-encoded .p8
+      is_key_content_base64: true,
+      duration: 1200,
+      in_house: false
+    )
+
+    # The CI run number drives the build number; the marketing version (1.0)
+    # stays manual in the project. Falls back to "latest TestFlight + 1" locally.
+    increment_build_number(
+      build_number: ENV["GITHUB_RUN_NUMBER"] || (latest_testflight_build_number(
+        api_key: api_key,
+        app_identifier: "com.defrust.drift"
+      ) + 1).to_s,
+      xcodeproj: "Drift.xcodeproj"
+    )
+
+    # Automatic signing: Xcode creates/refreshes the App Store distribution
+    # profile using the API key (-allowProvisioningUpdates). No widget target
+    # exists yet, so there are no extra profiles to map. Add the widget profile
+    # here once that target ships.
+    build_app(
+      project: "Drift.xcodeproj",
+      scheme: "Drift",
+      configuration: "Release",
+      export_method: "app-store",
+      api_key: api_key,
+      xcargs: "-allowProvisioningUpdates",
+      export_options: {
+        manageAppVersionAndBuildNumber: false
+      },
+      clean: true
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true,
+      changelog: ENV["BETA_CHANGELOG"] || "Internal CI build",
+      distribute_external: false,
+      notify_external_testers: false
+    )
+  end
+end

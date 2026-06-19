@@ -1,0 +1,37 @@
+name: Beta (TestFlight)
+on:
+  push:
+    branches: [release/*]
+  workflow_dispatch:
+
+jobs:
+  beta:
+    name: Build & upload to TestFlight
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Pick the newest Xcode 26.x on the runner (matches ci.yml).
+      - name: Select Xcode 26
+        run: |
+          XCODE_PATH=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$XCODE_PATH" ]; then
+            sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          fi
+          xcodebuild -version
+
+      - name: Set up Ruby + bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Build & upload via fastlane
+        run: bundle exec fastlane beta
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
+          APP_STORE_TEAM_ID: ${{ secrets.APP_STORE_TEAM_ID }}
+          BETA_CHANGELOG: "Internal CI build"

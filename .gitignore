@@ -21,3 +21,7 @@ fastlane/test_output/
 AuthKey_*.p8
 *.mobileprovision
 .env
+
+fastlane/Preview.html
+*.ipa
+*.dSYM.zip
