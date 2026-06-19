@@ -39,15 +39,15 @@ platform :ios do
     )
 
     # Automatic signing: Xcode creates/refreshes the App Store distribution
-    # profile using the API key (-allowProvisioningUpdates). No widget target
-    # exists yet, so there are no extra profiles to map. Add the widget profile
-    # here once that target ships.
+    # profile on demand. `app_store_connect_api_key` above also writes the key to
+    # disk and sets FASTLANE_* env, which gym/xcodebuild use to authenticate the
+    # `-allowProvisioningUpdates` request. No widget target exists yet, so there
+    # are no extra profiles to map — add the widget profile here once it ships.
     build_app(
       project: "Drift.xcodeproj",
       scheme: "Drift",
       configuration: "Release",
       export_method: "app-store",
-      api_key: api_key,
       xcargs: "-allowProvisioningUpdates",
       export_options: {
         manageAppVersionAndBuildNumber: false
