@@ -19,36 +19,47 @@ platform :ios do
 
   desc "Build and upload a build to TestFlight (internal testers only)"
   lane :beta do
+    require "base64"
+    require "tmpdir"
+
+    key_id    = ENV["APP_STORE_CONNECT_KEY_ID"]
+    issuer_id = ENV["APP_STORE_CONNECT_ISSUER_ID"]
+    build_no  = ENV["GITHUB_RUN_NUMBER"] || "1"
+
+    # Decode the base64 .p8 to a real file on disk. The CI runner has no Apple ID
+    # logged in, so xcodebuild needs the API key file to authenticate and let
+    # automatic signing create the App Store certificate + profile.
+    key_path = File.join(Dir.tmpdir, "asc_authkey.p8")
+    File.write(key_path, Base64.decode64(ENV["APP_STORE_CONNECT_KEY_CONTENT"]))
+
+    # Same key in hash form, for the upload step.
     api_key = app_store_connect_api_key(
-      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
-      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_id: key_id,
+      issuer_id: issuer_id,
       key_content: ENV["APP_STORE_CONNECT_KEY_CONTENT"], # base64-encoded .p8
       is_key_content_base64: true,
       duration: 1200,
       in_house: false
     )
 
-    # The CI run number drives the build number; the marketing version (1.0)
-    # stays manual in the project. Falls back to "latest TestFlight + 1" locally.
-    increment_build_number(
-      build_number: ENV["GITHUB_RUN_NUMBER"] || (latest_testflight_build_number(
-        api_key: api_key,
-        app_identifier: "com.defrust.drift"
-      ) + 1).to_s,
-      xcodeproj: "Drift.xcodeproj"
-    )
+    # Pass the API key straight to xcodebuild (fixes "No Accounts / No profiles
+    # found"), and set the build number via the build setting — this project uses
+    # GENERATE_INFOPLIST_FILE=YES, so agvtool/increment_build_number isn't used
+    # (it mis-read the "YES" setting as a file path).
+    xcargs = [
+      "-allowProvisioningUpdates",
+      "-authenticationKeyPath", key_path,
+      "-authenticationKeyID", key_id,
+      "-authenticationKeyIssuerID", issuer_id,
+      "CURRENT_PROJECT_VERSION=#{build_no}"
+    ].join(" ")
 
-    # Automatic signing: Xcode creates/refreshes the App Store distribution
-    # profile on demand. `app_store_connect_api_key` above also writes the key to
-    # disk and sets FASTLANE_* env, which gym/xcodebuild use to authenticate the
-    # `-allowProvisioningUpdates` request. No widget target exists yet, so there
-    # are no extra profiles to map — add the widget profile here once it ships.
     build_app(
       project: "Drift.xcodeproj",
       scheme: "Drift",
       configuration: "Release",
       export_method: "app-store",
-      xcargs: "-allowProvisioningUpdates",
+      xcargs: xcargs,
       export_options: {
         manageAppVersionAndBuildNumber: false
       },
