@@ -1,0 +1,9 @@
+git_url("https://github.com/AI-AUTOSITE/drift-certificates.git")
+storage_mode("git")
+
+# App Store distribution certificate + profile for Drift.
+type("appstore")
+app_identifier(["com.defrust.drift"])
+
+# On CI we authenticate with the App Store Connect API key (set in the Fastfile),
+# so no Apple ID username is needed here.
