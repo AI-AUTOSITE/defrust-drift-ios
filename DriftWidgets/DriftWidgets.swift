@@ -335,11 +335,14 @@ private struct InlineWidgetView: View {
     let entry: DriftEntry
 
     var body: some View {
-        if let next = entry.upcoming.first {
-            Text("\(next.name) in \(daysUntil(next.date))d")
-        } else {
-            Text("No renewals due")
+        Group {
+            if let next = entry.upcoming.first {
+                Text("\(next.name) in \(daysUntil(next.date))d")
+            } else {
+                Text("No renewals due")
+            }
         }
+        .containerBackground(.clear, for: .widget)   // ← 追加
     }
 }
 
@@ -362,6 +365,7 @@ private struct RectangularWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .containerBackground(.clear, for: .widget)
         .widgetURL(URL(string: "drift://overview"))
     }
 }
@@ -372,14 +376,15 @@ private struct CircularWidgetView: View {
     var body: some View {
         ZStack {
             AccessoryWidgetBackground()
-            VStack(spacing: 0) {
-                Image(systemName: "dollarsign")
-                    .font(.caption2)
+            VStack(spacing: -2) {
                 Text("\(entry.upcoming.count)")
-                    .font(.system(.headline, design: .rounded))
-                    .minimumScaleFactor(0.5)
+                    .font(.system(.title2, design: .rounded, weight: .bold))
+                Text("due")
+                    .font(.system(size: 9))
+                    .foregroundStyle(.secondary)
             }
         }
+        .containerBackground(.clear, for: .widget)
         .widgetURL(URL(string: "drift://overview"))
     }
 }
