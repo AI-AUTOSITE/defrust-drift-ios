@@ -10,6 +10,7 @@
 
 import SwiftData
 import SwiftUI
+import WidgetKit
 
 struct SubscriptionDetailView: View {
     let subscription: Subscription
@@ -132,6 +133,7 @@ struct SubscriptionDetailView: View {
             subscription.pausedUntil = nil
         }
         try? context.save()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     private var header: some View {

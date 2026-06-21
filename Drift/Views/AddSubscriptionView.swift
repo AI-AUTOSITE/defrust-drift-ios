@@ -14,6 +14,7 @@
 
 import SwiftData
 import SwiftUI
+import WidgetKit
 
 struct AddSubscriptionView: View {
     @Environment(\.modelContext) private var context
@@ -241,6 +242,7 @@ struct AddSubscriptionView: View {
             context.insert(subscription)
         }
         try? context.save()
+        WidgetCenter.shared.reloadAllTimelines() 
         saveTick += 1
         dismiss()
     }

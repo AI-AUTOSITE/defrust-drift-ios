@@ -13,6 +13,7 @@
 
 import SwiftData
 import SwiftUI
+import WidgetKit
 
 struct SubscriptionsView: View {
     @Environment(\.modelContext) private var context
@@ -153,6 +154,7 @@ struct SubscriptionsView: View {
         guard let target = pendingDelete else { return }
         context.delete(target)
         try? context.save()
+        WidgetCenter.shared.reloadAllTimelines()
         pendingDelete = nil
         deletionState.pendingID = nil
     }
@@ -165,6 +167,7 @@ struct SubscriptionsView: View {
             }
         }
         try? context.save()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }
 
