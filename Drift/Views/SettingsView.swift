@@ -8,7 +8,9 @@
 //  and Request a Refund all live here, two taps in — never hidden.
 //
 //  A Developer section (DEBUG builds only — never shipped) seeds or clears
-//  sample subscriptions for testing the paywall and the free-tier limit.
+//  sample subscriptions for testing the paywall and the free-tier limit, and
+//  can seed one of every model so CloudKit mirrors every record type into the
+//  Development schema before it is deployed to Production.
 //
 //  Notifications and iCloud sync get their own sections later: iCloud once the
 //  App Group / CloudKit capability is configured, notifications once lead-time
@@ -179,12 +181,14 @@ struct SettingsView: View {
     private var developerSection: some View {
         Section {
             Button("Add 10 sample subscriptions") { addSampleData() }
+            Button("Seed sync schema (usage + reminder)") { seedSyncSchema() }
             Button("Delete all subscriptions", role: .destructive) { deleteAllData() }
         } header: {
             Text("Developer")
         } footer: {
-            Text("Debug builds only — never shipped. "
-                 + "Populate or reset data to test the paywall and free-tier limit.")
+            Text("Debug builds only — never shipped. Populate or reset sample data, "
+                 + "or seed one usage record and one reminder so CloudKit creates "
+                 + "every record type before deploying the schema to Production.")
         }
     }
 
@@ -205,6 +209,30 @@ struct SettingsView: View {
             )
             context.insert(subscription)
         }
+        try? context.save()
+    }
+
+    /// Inserts one `UsageRecord` and one `RenewalNotification` so SwiftData
+    /// mirrors `CD_UsageRecord` and `CD_RenewalNotification` into the CloudKit
+    /// Development schema. Without a saved record of each type those record
+    /// types never appear, and a Production schema deployed without them would
+    /// reject those records once usage logging / reminders ship. Links to the
+    /// first subscription when one exists (both relationships are optional).
+    private func seedSyncSchema() {
+        let firstSubscription = (try? context.fetch(FetchDescriptor<Subscription>()))?.first
+        let usage = UsageRecord(
+            subscription: firstSubscription,
+            date: Date(),
+            wasUsed: true,
+            note: "schema seed"
+        )
+        let reminder = RenewalNotification(
+            subscription: firstSubscription,
+            daysBeforeRenewal: 3,
+            isEnabled: true
+        )
+        context.insert(usage)
+        context.insert(reminder)
         try? context.save()
     }
 

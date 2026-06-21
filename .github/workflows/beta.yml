@@ -28,8 +28,9 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: true
 
-      - name: Build & upload via fastlane
-        run: bundle exec fastlane beta
+      # fastlane builds + signs and writes Drift.ipa to the repo root.
+      - name: Build & sign via fastlane
+        run: bundle exec fastlane build_only
         env:
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -37,4 +38,16 @@ jobs:
           APP_STORE_TEAM_ID: ${{ secrets.APP_STORE_TEAM_ID }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          BETA_CHANGELOG: "Internal CI build"
+
+      # Upload via the App Store Connect REST API. This avoids Xcode 26's broken
+      # altool ("Failed to generate JWT token (259)"). The api-private-key input
+      # takes the RAW .p8 contents (BEGIN PRIVATE KEY block), not base64.
+      - name: Upload to TestFlight
+        uses: apple-actions/upload-testflight-build@v5
+        with:
+          app-path: "Drift.ipa"
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          api-key-id: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY_RAW }}
+          backend: AppStoreAPI
+          wait-for-processing: "false"
