@@ -11,6 +11,9 @@
 //  something to pick from on a fresh install. `seedIfNeeded` is idempotent
 //  (it no-ops once any category exists), so calling it on appear is safe.
 //
+//  On first launch it presents the onboarding flow as a full-screen cover,
+//  gated by `@AppStorage("hasCompletedOnboarding")` so it is shown exactly once.
+//
 
 import Observation
 import SwiftData
@@ -18,6 +21,7 @@ import SwiftUI
 
 struct RootView: View {
     @Environment(\.modelContext) private var context
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @State private var router = DriftDeepLinkRouter.shared
     @State private var selection: AppTab = .overview
     @State private var deletionState = DeletionState()
@@ -52,6 +56,12 @@ struct RootView: View {
             case .none:
                 break
             }
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { !hasCompletedOnboarding },
+            set: { _ in }
+        )) {
+            OnboardingView { hasCompletedOnboarding = true }
         }
     }
 }
