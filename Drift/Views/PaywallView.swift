@@ -27,8 +27,7 @@ struct PaywallView: View {
     /// they are actually built (see the warning above).
     private let proFeatures = [
         "Track unlimited subscriptions",
-        "Reminders 3, 7, and 14 days ahead",
-        "Home screen widget"
+        "Reminders 3, 7, and 14 days ahead"
     ]
 
     private var proProduct: Product? {
