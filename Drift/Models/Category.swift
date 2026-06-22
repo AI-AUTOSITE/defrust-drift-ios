@@ -61,14 +61,38 @@ extension Category {
         CategoryPreset("Other", "#8E8E93", "ellipsis.circle.fill")
     ]
 
-    /// Seeds the ten default categories exactly once. Safe to call on every launch.
+    /// Ensures exactly one of each default category exists. Safe to call on
+    /// every launch.
+    ///
+    /// With CloudKit enabled, a fresh local store can seed its ten categories
+    /// before iCloud syncs its own copy down — and CloudKit allows no unique
+    /// constraints — so the same category can end up stored more than once.
+    /// We therefore first merge duplicates by name (keeping one and moving its
+    /// subscriptions onto it), then add any preset that is still missing.
+    /// Duplicates created by an earlier launch are collapsed the next time
+    /// this runs.
     @MainActor
     static func seedIfNeeded(in context: ModelContext) {
-        let descriptor = FetchDescriptor<Self>()
-        let existingCount = (try? context.fetchCount(descriptor)) ?? 0
-        guard existingCount == 0 else { return }
+        let all = (try? context.fetch(FetchDescriptor<Self>())) ?? []
 
-        for (index, preset) in defaultPresets.enumerated() {
+        var keepers: [String: Self] = [:]
+        var didChange = false
+
+        // Merge duplicates: keep the lowest sortOrder, move subscriptions over.
+        for category in all.sorted(by: { $0.sortOrder < $1.sortOrder }) {
+            if let keeper = keepers[category.name] {
+                for subscription in category.subscriptions ?? [] {
+                    subscription.category = keeper
+                }
+                context.delete(category)
+                didChange = true
+            } else {
+                keepers[category.name] = category
+            }
+        }
+
+        // Seed any preset that is still missing (idempotent by name).
+        for (index, preset) in defaultPresets.enumerated() where keepers[preset.name] == nil {
             let category = Self(
                 name: preset.name,
                 colorHex: preset.color,
@@ -76,7 +100,12 @@ extension Category {
                 sortOrder: index
             )
             context.insert(category)
+            keepers[preset.name] = category
+            didChange = true
         }
-        try? context.save()
+
+        if didChange {
+            try? context.save()
+        }
     }
 }
