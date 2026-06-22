@@ -3,9 +3,10 @@
 //  Drift
 //
 //  The per-subscription detail screen (Part 2 §10.2). Tapping a row in the
-//  Subscriptions list pushes this; from here the user can edit, delete, or jump
-//  to the matching cancellation guide. Delete routes back through the list so
-//  the same Undo affordance applies (no scary confirmation dialog).
+//  Subscriptions list pushes this; from here the user can edit, delete, set a
+//  one-time cancel reminder, or jump to the matching cancellation guide. Delete
+//  routes back through the list so the same Undo affordance applies (no scary
+//  confirmation dialog).
 //
 
 import SwiftData
@@ -23,6 +24,20 @@ struct SubscriptionDetailView: View {
     @State private var guideStore = CancellationGuideStore()
     @State private var isEditing = false
     @State private var pauseTick = 0
+
+    // Cancel reminder (a one-time, user-set "remind me to cancel" notification).
+    // Seeded from the model in init so toggling/editing fires onChange, but the
+    // initial load does not. A reminder whose date has passed reads as "off".
+    @State private var cancelReminderOn: Bool
+    @State private var cancelReminderDate: Date
+
+    init(subscription: Subscription, onDelete: @escaping (Subscription) -> Void) {
+        self.subscription = subscription
+        self.onDelete = onDelete
+        let future = subscription.cancelReminderDate.flatMap { $0 > Date() ? $0 : nil }
+        _cancelReminderOn = State(initialValue: future != nil)
+        _cancelReminderDate = State(initialValue: future ?? Self.defaultReminderDate(for: subscription))
+    }
 
     /// What's actually billed each cycle (full cycle price, own currency).
     private var renewalCharge: Decimal {
@@ -74,6 +89,22 @@ struct SubscriptionDetailView: View {
                 }
             }
 
+            Section {
+                Toggle("Remind me to cancel", isOn: $cancelReminderOn)
+                if cancelReminderOn {
+                    DatePicker(
+                        "Remind me on",
+                        selection: $cancelReminderDate,
+                        in: Date()...,
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                }
+            } header: {
+                Text("Cancel reminder")
+            } footer: {
+                Text("A one-time nudge to cancel this if you're no longer using it. Tapping it opens the cancellation guide.")
+            }
+
             if let guide = matchedGuide {
                 Section("Cancel") {
                     NavigationLink {
@@ -118,6 +149,8 @@ struct SubscriptionDetailView: View {
                 .presentationDragIndicator(.visible)
         }
         .driftHaptic(.subscriptionPaused, trigger: pauseTick)
+        .onChange(of: cancelReminderOn) { _, _ in applyCancelReminder() }
+        .onChange(of: cancelReminderDate) { _, _ in applyCancelReminder() }
     }
 
     private var renewalLabel: String {
@@ -128,6 +161,22 @@ struct SubscriptionDetailView: View {
         case .yearly: return "Per year"
         case .custom: return "Per cycle"
         }
+    }
+
+    /// A sensible default: a couple of days before the next renewal, at 10:00,
+    /// never in the past.
+    private static func defaultReminderDate(for sub: Subscription) -> Date {
+        let calendar = Calendar.current
+        let twoDaysBefore = calendar.date(byAdding: .day, value: -2, to: sub.nextRenewalDate) ?? sub.nextRenewalDate
+        let atTen = calendar.date(bySettingHour: 10, minute: 0, second: 0, of: twoDaysBefore) ?? twoDaysBefore
+        return max(atTen, Date().addingTimeInterval(3600))
+    }
+
+    /// Persist the chosen reminder (or clear it) and (re)schedule the local notification.
+    private func applyCancelReminder() {
+        subscription.cancelReminderDate = cancelReminderOn ? cancelReminderDate : nil
+        try? context.save()
+        Task { await NotificationScheduler.shared.setCancelReminder(for: subscription) }
     }
 
     private func togglePause() {

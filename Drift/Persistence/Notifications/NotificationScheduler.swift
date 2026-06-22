@@ -14,6 +14,11 @@ import UserNotifications
 /// ``rescheduleAllIfNeeded(in:)`` — meant to run after any add / edit / delete / pause and
 /// from the `BGAppRefreshTask`. It is idempotent: it clears Drift's pending reminders and
 /// re-adds exactly the prioritized set.
+///
+/// User-set "remind me to cancel" reminders are a separate, sparse namespace
+/// (`cancel-<uuid>`, one per subscription) managed by ``setCancelReminder(for:)`` and
+/// ``reconcileCancelReminders(in:)``. They are independent of pause state and of the
+/// renewal planner.
 @MainActor
 public final class NotificationScheduler: NSObject {
     public static let shared = NotificationScheduler()
@@ -32,6 +37,11 @@ public final class NotificationScheduler: NSObject {
     /// Matches ``PlannedNotification/id`` so the planner's output maps 1:1 to requests.
     private func identifier(subscriptionID: UUID, daysBefore: Int) -> String {
         "renewal-\(subscriptionID.uuidString)-\(daysBefore)"
+    }
+
+    /// One user-set cancel reminder per subscription.
+    private func cancelIdentifier(subscriptionID: UUID) -> String {
+        "cancel-\(subscriptionID.uuidString)"
     }
 
     // MARK: - Authorization (requested lazily, on the first reminder)
@@ -172,12 +182,86 @@ public final class NotificationScheduler: NSObject {
         return UNNotificationRequest(identifier: id, content: content, trigger: trigger)
     }
 
+    // MARK: - Cancel reminders (user-set, one per subscription)
+
+    /// Schedule (or clear) the single "remind me to cancel" notification for one
+    /// subscription, based on its `cancelReminderDate`. A `nil` or past date clears it.
+    /// Call after the user sets, changes, or turns off the reminder.
+    func setCancelReminder(for sub: Subscription) async {
+        let id = cancelIdentifier(subscriptionID: sub.id)
+        center.removePendingNotificationRequests(withIdentifiers: [id])
+
+        guard let fireDate = sub.cancelReminderDate, fireDate > Date() else { return }
+        guard await requestAuthorizationIfNeeded() else { return }
+
+        do {
+            try await center.add(cancelRequest(for: sub, fireDate: fireDate))
+        } catch {
+            // Non-fatal; the next reconcile retries.
+        }
+    }
+
+    /// Clear and re-add every cancel reminder from the stored dates. Local notifications
+    /// don't survive a reinstall, but `cancelReminderDate` does (SwiftData/CloudKit), so
+    /// this restores them on launch. Idempotent; prompts for permission only if at least
+    /// one future reminder exists.
+    public func reconcileCancelReminders(in context: ModelContext) async {
+        let pending = await center.pendingNotificationRequests()
+        let stale = pending.map(\.identifier).filter { $0.hasPrefix("cancel-") }
+        if !stale.isEmpty {
+            center.removePendingNotificationRequests(withIdentifiers: stale)
+        }
+
+        let now = Date()
+        let subs = (try? context.fetch(FetchDescriptor<Subscription>())) ?? []
+        let due = subs.filter { ($0.cancelReminderDate ?? .distantPast) > now }
+        guard !due.isEmpty else { return }
+        guard await requestAuthorizationIfNeeded() else { return }
+
+        for sub in due {
+            guard let fireDate = sub.cancelReminderDate else { continue }
+            do {
+                try await center.add(cancelRequest(for: sub, fireDate: fireDate))
+            } catch {
+                // Non-fatal.
+            }
+        }
+    }
+
+    /// A plain (category-less) reminder so the only interaction is a tap, which opens the
+    /// subscription's detail — where the matching cancellation guide lives.
+    private func cancelRequest(for sub: Subscription, fireDate: Date) -> UNNotificationRequest {
+        let content = UNMutableNotificationContent()
+        content.title = "Time to cancel \(sub.name)?"
+        let formatted = ExchangeRates.format(sub.monthlyCost, currencyCode: sub.currencyCode)
+        content.body = "Tap to review it and stop paying \(formatted)/mo if you're done."
+        content.sound = .default
+        content.threadIdentifier = "cancel-\(sub.id.uuidString)"
+        content.userInfo = [
+            "subscriptionID": sub.id.uuidString,
+            "kind": "cancel"
+        ]
+
+        let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
+        return UNNotificationRequest(
+            identifier: cancelIdentifier(subscriptionID: sub.id),
+            content: content,
+            trigger: trigger
+        )
+    }
+
     // MARK: - Targeted cancel (e.g. on delete or pause)
 
+    /// Remove a subscription's pending reminders — both renewal reminders and its
+    /// cancel reminder. Call on delete.
     public func cancel(subscriptionID: UUID) async {
-        let prefix = "renewal-\(subscriptionID.uuidString)-"
+        let renewalPrefix = "renewal-\(subscriptionID.uuidString)-"
+        let cancelID = cancelIdentifier(subscriptionID: subscriptionID)
         let pending = await center.pendingNotificationRequests()
-        let ids = pending.map(\.identifier).filter { $0.hasPrefix(prefix) }
+        let ids = pending.map(\.identifier).filter {
+            $0.hasPrefix(renewalPrefix) || $0 == cancelID
+        }
         if !ids.isEmpty {
             center.removePendingNotificationRequests(withIdentifiers: ids)
         }

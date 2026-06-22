@@ -31,6 +31,11 @@ extension DriftSchemaV1 {
         // MARK: - Dates
         var startDate: Date = Date()
         var nextRenewalDate: Date = Date()
+        /// User-chosen one-time "remind me to cancel this" date/time. `nil` means
+        /// no reminder. Scheduled as a `cancel-<uuid>` local notification, separate
+        /// from the automatic renewal reminders. Optional so CloudKit can add the
+        /// field without a heavyweight migration.
+        var cancelReminderDate: Date?
 
         // MARK: - State
         var isPaused: Bool = false
