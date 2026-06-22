@@ -176,7 +176,9 @@ struct SubscriptionDetailView: View {
     private func applyCancelReminder() {
         subscription.cancelReminderDate = cancelReminderOn ? cancelReminderDate : nil
         try? context.save()
-        Task { await NotificationScheduler.shared.setCancelReminder(for: subscription) }
+        Task { @MainActor in
+            await NotificationScheduler.shared.setCancelReminder(for: subscription)
+        }
     }
 
     private func togglePause() {
