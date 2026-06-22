@@ -53,6 +53,7 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView()
+                    .presentationDragIndicator(.visible)
             }
         }
     }

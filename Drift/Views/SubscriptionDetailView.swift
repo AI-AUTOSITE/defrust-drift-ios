@@ -22,6 +22,7 @@ struct SubscriptionDetailView: View {
     @Environment(\.modelContext) private var context
     @State private var guideStore = CancellationGuideStore()
     @State private var isEditing = false
+    @State private var pauseTick = 0
 
     /// What's actually billed each cycle (full cycle price, own currency).
     private var renewalCharge: Decimal {
@@ -114,7 +115,9 @@ struct SubscriptionDetailView: View {
         }
         .sheet(isPresented: $isEditing) {
             AddSubscriptionView(existing: subscription)
+                .presentationDragIndicator(.visible)
         }
+        .driftHaptic(.subscriptionPaused, trigger: pauseTick)
     }
 
     private var renewalLabel: String {
@@ -128,6 +131,7 @@ struct SubscriptionDetailView: View {
     }
 
     private func togglePause() {
+        pauseTick += 1
         subscription.isPaused.toggle()
         if !subscription.isPaused {
             subscription.pausedUntil = nil

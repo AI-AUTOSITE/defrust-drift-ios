@@ -26,6 +26,8 @@ struct SubscriptionsView: View {
     @State private var isShowingPaywall = false
     @State private var pendingDelete: Subscription?
     @State private var deleteTick = 0
+    @State private var pauseTick = 0
+    @State private var undoTick = 0
 
     /// Hides the row that is in its Undo window so it reads as removed at once.
     private var visibleSubscriptions: [Subscription] {
@@ -65,11 +67,15 @@ struct SubscriptionsView: View {
         }
         .sheet(isPresented: $isAdding) {
             AddSubscriptionView()
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $isShowingPaywall) {
             PaywallView()
+                .presentationDragIndicator(.visible)
         }
         .driftHaptic(.subscriptionDeleted, trigger: deleteTick)
+        .driftHaptic(.subscriptionPaused, trigger: pauseTick)
+        .driftHaptic(.navigationLight, trigger: undoTick)
         .task(id: pendingDelete?.persistentModelID) {
             // Commit the delete once the Undo window elapses (unless undone,
             // which cancels and restarts this task with a nil id).
@@ -146,6 +152,7 @@ struct SubscriptionsView: View {
     }
 
     private func undoDelete() {
+        undoTick += 1
         withAnimation { pendingDelete = nil }
         deletionState.pendingID = nil
     }
@@ -160,6 +167,7 @@ struct SubscriptionsView: View {
     }
 
     private func togglePause(_ subscription: Subscription) {
+        pauseTick += 1
         withAnimation {
             subscription.isPaused.toggle()
             if !subscription.isPaused {

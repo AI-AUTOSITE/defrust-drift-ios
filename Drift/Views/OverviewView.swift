@@ -89,6 +89,7 @@ struct OverviewView: View {
             }
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView()
+                    .presentationDragIndicator(.visible)
             }
         }
     }

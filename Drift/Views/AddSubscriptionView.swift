@@ -43,6 +43,11 @@ struct AddSubscriptionView: View {
     /// Bumped on a successful save so the success haptic fires.
     @State private var saveTick = 0
 
+    /// Tracks which text field owns the keyboard. The number pad has no return
+    /// key, so the keyboard toolbar's "Done" button clears this to dismiss it.
+    private enum Field { case name, amount }
+    @FocusState private var focusedField: Field?
+
     init(existing: Subscription? = nil) {
         self.existing = existing
     }
@@ -95,11 +100,13 @@ struct AddSubscriptionView: View {
                 Section("Basics") {
                     TextField("Name", text: $name)
                         .textInputAutocapitalization(.words)
+                        .focused($focusedField, equals: .name)
                 }
 
                 Section("Price") {
                     TextField("0.00", text: $amountText)
                         .keyboardType(.decimalPad)
+                        .focused($focusedField, equals: .amount)
 
                     Picker("Currency", selection: $currencyCode) {
                         ForEach(ExchangeRates.rates.keys.sorted(), id: \.self) { code in
@@ -140,6 +147,8 @@ struct AddSubscriptionView: View {
             }
             .navigationTitle(isEditing ? "Edit Subscription" : "Add Subscription")
             .navigationBarTitleDisplayMode(.inline)
+            .scrollDismissesKeyboard(.interactively)
+            .dismissKeyboardOnTapOutside()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -149,12 +158,24 @@ struct AddSubscriptionView: View {
                         .fontWeight(.semibold)
                         .disabled(!canSave)
                 }
+                // The number pad has no return key; this puts the keyboard away.
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button {
+                        focusedField = nil
+                    } label: {
+                        Image(systemName: "keyboard.chevron.compact.down")
+                    }
+                    .accessibilityLabel("Dismiss keyboard")
+                }
             }
             .sheet(isPresented: $isPickingService) {
                 ServicePickerView { applyService($0) }
+                    .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView()
+                    .presentationDragIndicator(.visible)
             }
             .driftHaptic(.subscriptionAdded, trigger: saveTick)
             .onAppear(perform: populate)
@@ -242,7 +263,7 @@ struct AddSubscriptionView: View {
             context.insert(subscription)
         }
         try? context.save()
-        WidgetCenter.shared.reloadAllTimelines() 
+        WidgetCenter.shared.reloadAllTimelines()
         saveTick += 1
         dismiss()
     }

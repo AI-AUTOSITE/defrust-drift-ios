@@ -15,6 +15,7 @@ import SwiftUI
 enum DriftHaptic {
     case subscriptionAdded
     case subscriptionDeleted
+    case subscriptionPaused
     case proPurchased
     case renewalSoon
     case navigationLight
@@ -25,6 +26,9 @@ enum DriftHaptic {
             return .success
         case .subscriptionDeleted:
             return .impact(weight: .light, intensity: 0.6)
+        case .subscriptionPaused:
+            // A calm, neutral tick for a reversible state toggle (pause/resume).
+            return .selection
         case .renewalSoon:
             return .warning
         case .navigationLight:
