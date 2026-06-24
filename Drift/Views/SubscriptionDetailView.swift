@@ -173,11 +173,20 @@ struct SubscriptionDetailView: View {
     }
 
     /// Persist the chosen reminder (or clear it) and (re)schedule the local notification.
+    /// Reads the Sendable fields up front so the model never crosses into the task.
     private func applyCancelReminder() {
-        subscription.cancelReminderDate = cancelReminderOn ? cancelReminderDate : nil
+        let fireDate = cancelReminderOn ? cancelReminderDate : nil
+        subscription.cancelReminderDate = fireDate
         try? context.save()
-        Task { @MainActor in
-            await NotificationScheduler.shared.setCancelReminder(for: subscription)
+
+        let id = subscription.id
+        let name = subscription.name
+        let monthlyCost = subscription.monthlyCost
+        let currencyCode = subscription.currencyCode
+        Task {
+            await NotificationScheduler.shared.setCancelReminder(
+                id: id, name: name, monthlyCost: monthlyCost, currencyCode: currencyCode, fireDate: fireDate
+            )
         }
     }
 

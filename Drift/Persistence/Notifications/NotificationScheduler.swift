@@ -185,17 +185,26 @@ public final class NotificationScheduler: NSObject {
     // MARK: - Cancel reminders (user-set, one per subscription)
 
     /// Schedule (or clear) the single "remind me to cancel" notification for one
-    /// subscription, based on its `cancelReminderDate`. A `nil` or past date clears it.
-    /// Call after the user sets, changes, or turns off the reminder.
-    func setCancelReminder(for sub: Subscription) async {
-        let id = cancelIdentifier(subscriptionID: sub.id)
-        center.removePendingNotificationRequests(withIdentifiers: [id])
+    /// subscription. Takes only Sendable values — no SwiftData model — so the caller can
+    /// read them on the main actor and hand them to a task without crossing a `@Model`
+    /// across threads. A `nil` or past `fireDate` clears the reminder.
+    func setCancelReminder(
+        id: UUID,
+        name: String,
+        monthlyCost: Decimal,
+        currencyCode: String,
+        fireDate: Date?
+    ) async {
+        center.removePendingNotificationRequests(withIdentifiers: [cancelIdentifier(subscriptionID: id)])
 
-        guard let fireDate = sub.cancelReminderDate, fireDate > Date() else { return }
+        guard let fireDate, fireDate > Date() else { return }
         guard await requestAuthorizationIfNeeded() else { return }
 
+        let request = cancelRequest(
+            id: id, name: name, monthlyCost: monthlyCost, currencyCode: currencyCode, fireDate: fireDate
+        )
         do {
-            try await center.add(cancelRequest(for: sub, fireDate: fireDate))
+            try await center.add(request)
         } catch {
             // Non-fatal; the next reconcile retries.
         }
@@ -203,25 +212,31 @@ public final class NotificationScheduler: NSObject {
 
     /// Clear and re-add every cancel reminder from the stored dates. Local notifications
     /// don't survive a reinstall, but `cancelReminderDate` does (SwiftData/CloudKit), so
-    /// this restores them on launch. Idempotent; prompts for permission only if at least
-    /// one future reminder exists.
-    public func reconcileCancelReminders(in context: ModelContext) async {
+    /// this restores them on launch. Reads the shared main context on the main actor — no
+    /// context is passed across an async boundary. Idempotent; prompts for permission only
+    /// if at least one future reminder exists.
+    public func reconcileCancelReminders() async {
         let pending = await center.pendingNotificationRequests()
         let stale = pending.map(\.identifier).filter { $0.hasPrefix("cancel-") }
         if !stale.isEmpty {
             center.removePendingNotificationRequests(withIdentifiers: stale)
         }
 
+        let context = SharedModelContainer.shared.mainContext
         let now = Date()
         let subs = (try? context.fetch(FetchDescriptor<Subscription>())) ?? []
-        let due = subs.filter { ($0.cancelReminderDate ?? .distantPast) > now }
+        // Snapshot only the Sendable fields we need, on the main actor, before any await.
+        let due = subs.compactMap { CancelReminderInfo(subscription: $0, after: now) }
         guard !due.isEmpty else { return }
         guard await requestAuthorizationIfNeeded() else { return }
 
-        for sub in due {
-            guard let fireDate = sub.cancelReminderDate else { continue }
+        for item in due {
+            let request = cancelRequest(
+                id: item.id, name: item.name, monthlyCost: item.monthlyCost,
+                currencyCode: item.currencyCode, fireDate: item.fireDate
+            )
             do {
-                try await center.add(cancelRequest(for: sub, fireDate: fireDate))
+                try await center.add(request)
             } catch {
                 // Non-fatal.
             }
@@ -229,23 +244,30 @@ public final class NotificationScheduler: NSObject {
     }
 
     /// A plain (category-less) reminder so the only interaction is a tap, which opens the
-    /// subscription's detail — where the matching cancellation guide lives.
-    private func cancelRequest(for sub: Subscription, fireDate: Date) -> UNNotificationRequest {
+    /// subscription's detail — where the matching cancellation guide lives. Built from
+    /// Sendable values only.
+    private func cancelRequest(
+        id: UUID,
+        name: String,
+        monthlyCost: Decimal,
+        currencyCode: String,
+        fireDate: Date
+    ) -> UNNotificationRequest {
         let content = UNMutableNotificationContent()
-        content.title = "Time to cancel \(sub.name)?"
-        let formatted = ExchangeRates.format(sub.monthlyCost, currencyCode: sub.currencyCode)
+        content.title = "Time to cancel \(name)?"
+        let formatted = ExchangeRates.format(monthlyCost, currencyCode: currencyCode)
         content.body = "Tap to review it and stop paying \(formatted)/mo if you're done."
         content.sound = .default
-        content.threadIdentifier = "cancel-\(sub.id.uuidString)"
+        content.threadIdentifier = "cancel-\(id.uuidString)"
         content.userInfo = [
-            "subscriptionID": sub.id.uuidString,
+            "subscriptionID": id.uuidString,
             "kind": "cancel"
         ]
 
         let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
         return UNNotificationRequest(
-            identifier: cancelIdentifier(subscriptionID: sub.id),
+            identifier: cancelIdentifier(subscriptionID: id),
             content: content,
             trigger: trigger
         )
@@ -270,15 +292,18 @@ public final class NotificationScheduler: NSObject {
 
 // MARK: - UNUserNotificationCenterDelegate
 
-extension NotificationScheduler: UNUserNotificationCenterDelegate {
-    nonisolated public func userNotificationCenter(
+extension NotificationScheduler: @MainActor UNUserNotificationCenterDelegate {
+    // No `nonisolated`: under Default Actor Isolation = MainActor, an isolated
+    // conformance keeps these on the main actor. Marking them `nonisolated` runs the
+    // bridged async completion off-main → "Call must be made on main thread" on tap.
+    public func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
         [.banner, .list, .sound]
     }
 
-    nonisolated public func userNotificationCenter(
+    public func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse
     ) async {
@@ -298,5 +323,28 @@ extension NotificationScheduler: UNUserNotificationCenterDelegate {
         default:
             break
         }
+    }
+}
+
+// MARK: - Cancel reminder snapshot
+
+/// A Sendable snapshot of the fields a cancel reminder needs, so a `@Model` never has to
+/// cross an async boundary. Built on the main actor while reconciling.
+private struct CancelReminderInfo {
+    let id: UUID
+    let name: String
+    let monthlyCost: Decimal
+    let currencyCode: String
+    let fireDate: Date
+
+    /// Returns `nil` unless the subscription has a cancel reminder dated after `date`.
+    @MainActor
+    init?(subscription: Subscription, after date: Date) {
+        guard let fire = subscription.cancelReminderDate, fire > date else { return nil }
+        self.id = subscription.id
+        self.name = subscription.name
+        self.monthlyCost = subscription.monthlyCost
+        self.currencyCode = subscription.currencyCode
+        self.fireDate = fire
     }
 }

@@ -13,6 +13,7 @@
 
 import SwiftData
 import SwiftUI
+import UIKit
 import WidgetKit
 
 struct SubscriptionsView: View {
@@ -78,9 +79,12 @@ struct SubscriptionsView: View {
         .driftHaptic(.navigationLight, trigger: undoTick)
         .task(id: pendingDelete?.persistentModelID) {
             // Commit the delete once the Undo window elapses (unless undone,
-            // which cancels and restarts this task with a nil id).
+            // which cancels and restarts this task with a nil id). VoiceOver and
+            // Switch Control users get longer to reach the Undo control.
             guard pendingDelete != nil else { return }
-            try? await Task.sleep(for: .seconds(4))
+            let needsMoreTime = UIAccessibility.isVoiceOverRunning
+                || UIAccessibility.isSwitchControlRunning
+            try? await Task.sleep(for: needsMoreTime ? .seconds(10) : .seconds(4))
             guard !Task.isCancelled else { return }
             commitPendingDelete()
         }
@@ -107,6 +111,14 @@ struct SubscriptionsView: View {
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
+                }
+                // Swipe actions are invisible to VoiceOver / Switch Control, so the
+                // same operations are exposed as custom actions (the Actions rotor).
+                .accessibilityAction(named: subscription.isPaused ? "Resume" : "Pause") {
+                    togglePause(subscription)
+                }
+                .accessibilityAction(named: "Delete") {
+                    requestDelete(subscription)
                 }
             }
         }
@@ -146,9 +158,14 @@ struct SubscriptionsView: View {
         // Finalize any previous pending delete before starting a new one.
         commitPendingDelete()
         deleteTick += 1
+        let name = subscription.name
         withAnimation { pendingDelete = subscription }
         // Share it so the Overview total drops this subscription right away.
         deletionState.pendingID = subscription.persistentModelID
+        UIAccessibility.post(
+            notification: .announcement,
+            argument: "Removed \(name). Undo available."
+        )
     }
 
     private func undoDelete() {
@@ -212,5 +229,18 @@ private struct SubscriptionRow: View {
         }
         .padding(.vertical, DriftSpacing.s4)
         .opacity(subscription.isPaused ? 0.55 : 1)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityDescription)
+    }
+
+    /// One coherent VoiceOver phrase ("Netflix, $15.99 per month, renews March 3")
+    /// instead of four separate stops (icon, name, status, cost).
+    private var accessibilityDescription: String {
+        let cost = subscription.monthlyCost
+            .formatted(.currency(code: subscription.currencyCode))
+        let status = subscription.isPaused
+            ? "paused"
+            : "renews \(subscription.nextRenewalDate.formatted(.dateTime.month(.wide).day()))"
+        return "\(subscription.name), \(cost) per month, \(status)"
     }
 }

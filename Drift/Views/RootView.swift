@@ -44,7 +44,7 @@ struct RootView: View {
         .environment(deletionState)
         .modifier(GlassTabBarBehavior())
         .onAppear { Category.seedIfNeeded(in: context) }
-        .task { await NotificationScheduler.shared.reconcileCancelReminders(in: context) }
+        .task { await NotificationScheduler.shared.reconcileCancelReminders() }
         .onOpenURL { router.handle(url: $0) }
         .onChange(of: router.route) { _, route in
             switch route {
