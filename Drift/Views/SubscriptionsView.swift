@@ -198,9 +198,15 @@ struct SubscriptionsView: View {
 
 private struct SubscriptionRow: View {
     let subscription: Subscription
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        HStack(spacing: DriftSpacing.s12) {
+        // Normally the price sits at the trailing edge on one line. At larger
+        // text sizes it would squeeze the name, so the row aligns to the top and
+        // the price drops onto its own line beneath the name and renewal date.
+        let isLarge = dynamicTypeSize >= .xLarge
+
+        HStack(alignment: isLarge ? .top : .center, spacing: DriftSpacing.s12) {
             Image(systemName: subscription.iconName)
                 .font(.title3)
                 .symbolRenderingMode(.hierarchical)
@@ -210,27 +216,36 @@ private struct SubscriptionRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(subscription.name)
                     .font(.body)
-                if subscription.isPaused {
-                    Text("Paused")
-                        .font(.footnote)
-                        .foregroundStyle(DriftTheme.subtleText)
-                } else {
-                    Text("Renews \(subscription.nextRenewalDate.formatted(.dateTime.month().day()))")
-                        .font(.footnote)
-                        .foregroundStyle(DriftTheme.subtleText)
-                }
+                statusLine
+                if isLarge { amountText }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer(minLength: DriftSpacing.s8)
-
-            Text(subscription.monthlyCost,
-                 format: .currency(code: subscription.currencyCode))
-                .font(DriftTypography.amount)
+            if !isLarge { amountText }
         }
         .padding(.vertical, DriftSpacing.s4)
         .opacity(subscription.isPaused ? 0.55 : 1)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityDescription)
+    }
+
+    @ViewBuilder
+    private var statusLine: some View {
+        if subscription.isPaused {
+            Text("Paused")
+                .font(.footnote)
+                .foregroundStyle(DriftTheme.subtleText)
+        } else {
+            Text("Renews \(subscription.nextRenewalDate.formatted(.dateTime.month().day()))")
+                .font(.footnote)
+                .foregroundStyle(DriftTheme.subtleText)
+        }
+    }
+
+    private var amountText: some View {
+        Text(subscription.monthlyCost,
+             format: .currency(code: subscription.currencyCode))
+            .font(DriftTypography.amount)
     }
 
     /// One coherent VoiceOver phrase ("Netflix, $15.99 per month, renews March 3")
