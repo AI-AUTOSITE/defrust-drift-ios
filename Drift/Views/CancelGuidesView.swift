@@ -48,20 +48,30 @@ struct CancelGuidesView: View {
 
 private struct CancelGuideRow: View {
     let guide: CancellationGuide
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        HStack(spacing: DriftSpacing.s12) {
+        // At accessibility text sizes the friction badge grows wide enough to
+        // crush the service name down to "Am…". So the row switches from a
+        // single line to a vertical stack: the name gets the full width on its
+        // own line(s), and the badge drops beneath it. Same child views either
+        // way, so AnyLayout just swaps the arrangement.
+        let isLarge = dynamicTypeSize.isAccessibilitySize
+        let layout = isLarge
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: DriftSpacing.s8))
+            : AnyLayout(HStackLayout(spacing: DriftSpacing.s12))
+
+        layout {
             VStack(alignment: .leading, spacing: 2) {
                 Text(guide.serviceName)
                     .font(.body)
-                    .lineLimit(1)
+                    .lineLimit(isLarge ? 2 : 1)
                 Text(guide.category)
                     .font(.footnote)
                     .foregroundStyle(DriftTheme.subtleText)
-                    .lineLimit(1)
+                    .lineLimit(isLarge ? 2 : 1)
             }
-
-            Spacer(minLength: DriftSpacing.s8)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             DarkPatternBadge(score: guide.darkPatternScore)
         }

@@ -10,6 +10,7 @@ import SwiftUI
 
 struct DarkPatternBadge: View {
     let score: Int
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var label: String {
         switch score {
@@ -36,8 +37,11 @@ struct DarkPatternBadge: View {
             Text(label)
                 .font(.subheadline)
         }
-        .lineLimit(1)
-        .fixedSize(horizontal: true, vertical: false)
+        // Normally a tidy single-line pill that never compresses. At
+        // accessibility text sizes the words would otherwise push the pill wider
+        // than the screen and clip, so there we let the label wrap to two lines.
+        .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+        .fixedSize(horizontal: !dynamicTypeSize.isAccessibilitySize, vertical: false)
         .foregroundStyle(.white)
         .padding(.horizontal, DriftSpacing.s8)
         .padding(.vertical, DriftSpacing.s4)
