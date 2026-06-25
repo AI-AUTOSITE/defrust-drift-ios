@@ -20,6 +20,8 @@ struct SubscriptionsView: View {
     @Environment(\.modelContext) private var context
     @Environment(DeletionState.self) private var deletionState
     @Environment(DriftStore.self) private var store
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Query(sort: \Subscription.name)
     private var subscriptions: [Subscription]
 
@@ -138,10 +140,20 @@ struct SubscriptionsView: View {
             }
             .padding(.horizontal, DriftSpacing.s16)
             .padding(.vertical, DriftSpacing.s12)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .background(
+                // Reduce Transparency swaps the frosted material for an opaque
+                // surface so the banner stays readable without translucency.
+                reduceTransparency
+                    ? AnyShapeStyle(Color(uiColor: .secondarySystemGroupedBackground))
+                    : AnyShapeStyle(.regularMaterial),
+                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+            )
             .padding(.horizontal, DriftSpacing.s16)
             .padding(.bottom, DriftSpacing.s8)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
+            // Reduce Motion drops the slide-up and just cross-fades.
+            .transition(reduceMotion
+                ? .opacity
+                : .move(edge: .bottom).combined(with: .opacity))
         }
     }
 
