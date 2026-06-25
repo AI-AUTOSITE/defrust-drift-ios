@@ -51,12 +51,13 @@ private struct CancelGuideRow: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        // At accessibility text sizes the friction badge grows wide enough to
-        // crush the service name down to "Am…". So the row switches from a
-        // single line to a vertical stack: the name gets the full width on its
-        // own line(s), and the badge drops beneath it. Same child views either
-        // way, so AnyLayout just swaps the arrangement.
-        let isLarge = dynamicTypeSize.isAccessibilitySize
+        // Larger text makes the friction badge wide enough to crush the service
+        // name down to "Am…". So once the text is enlarged the row switches from
+        // a single line to a vertical stack: the name keeps the full width on its
+        // own line(s) and the badge drops beneath it. At normal sizes it stays a
+        // tidy one-liner. Same child views either way, so AnyLayout just swaps
+        // the arrangement.
+        let isLarge = dynamicTypeSize >= .xLarge
         let layout = isLarge
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: DriftSpacing.s8))
             : AnyLayout(HStackLayout(spacing: DriftSpacing.s12))
