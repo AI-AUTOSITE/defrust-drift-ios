@@ -199,6 +199,10 @@ struct SubscriptionsView: View {
 private struct SubscriptionRow: View {
     let subscription: Subscription
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    /// The icon box grows on the same Dynamic Type ramp as its glyph (.title3),
+    /// so at large text sizes the symbol can't overflow a fixed 32-pt frame and
+    /// collide with the name.
+    @ScaledMetric(relativeTo: .title3) private var iconSize: CGFloat = 32
 
     var body: some View {
         // Normally the price sits at the trailing edge on one line. At larger
@@ -211,7 +215,7 @@ private struct SubscriptionRow: View {
                 .font(.title3)
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(Color(hex: subscription.customColor))
-                .frame(width: 32, height: 32)
+                .frame(width: iconSize, height: iconSize)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(subscription.name)
