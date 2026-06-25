@@ -317,7 +317,7 @@ extension NotificationScheduler: @MainActor UNUserNotificationCenterDelegate {
         case "drift.action.snooze":
             await NotificationActionHandler.shared.snooze(subscriptionID: subscriptionID, by: 1)
         case UNNotificationDefaultActionIdentifier:
-            await DriftDeepLinkRouter.shared.open(subscriptionID: subscriptionID)
+            DriftDeepLinkRouter.shared.open(subscriptionID: subscriptionID)
         case UNNotificationDismissActionIdentifier:
             break
         default:
