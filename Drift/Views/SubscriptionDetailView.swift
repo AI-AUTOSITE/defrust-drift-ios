@@ -215,7 +215,7 @@ struct SubscriptionDetailView: View {
             Image(systemName: subscription.iconName)
                 .font(.largeTitle)
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(Color(hex: subscription.customColor))
+                .foregroundStyle(Color.categoryTint(hex: subscription.customColor))
                 .frame(width: headerIconSize, height: headerIconSize)
                 .background(DriftTheme.neutralFill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 

@@ -193,7 +193,7 @@ private struct RenewalChip: View {
             Image(systemName: subscription.iconName)
                 .font(.title3)
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(Color(hex: subscription.customColor))
+                .foregroundStyle(Color.categoryTint(hex: subscription.customColor))
                 .padding(.bottom, DriftSpacing.s4)
 
             Text(subscription.name)

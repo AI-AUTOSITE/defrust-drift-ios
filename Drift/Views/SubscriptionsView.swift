@@ -214,7 +214,7 @@ private struct SubscriptionRow: View {
             Image(systemName: subscription.iconName)
                 .font(.title3)
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(Color(hex: subscription.customColor))
+                .foregroundStyle(Color.categoryTint(hex: subscription.customColor))
                 .frame(width: iconSize, height: iconSize)
 
             VStack(alignment: .leading, spacing: 2) {

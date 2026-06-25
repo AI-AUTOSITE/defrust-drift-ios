@@ -11,6 +11,7 @@
 
 import Foundation
 import SwiftUI
+import UIKit
 
 /// RGB components in the 0...1 range.
 ///
@@ -50,5 +51,51 @@ extension Color {
             return
         }
         self.init(red: rgb.red, green: rgb.green, blue: rgb.blue)
+    }
+
+    /// A category/subscription tint that stays legible in both appearances.
+    ///
+    /// The stored vivid hex reads well on dark backgrounds, so dark mode uses it
+    /// unchanged. On a light (white) background several of these — yellow, green,
+    /// orange, light blue — fall below the WCAG 3:1 non-text contrast bar and
+    /// wash out, so light mode darkens the color (keeping its hue) just until it
+    /// clears 3:1. Colors that already pass are untouched, and existing stored
+    /// data needs no migration because the adjustment happens at render time.
+    static func categoryTint(hex: String, fallback: Color = .secondary) -> Color {
+        guard let rgb = HexColor.rgb(from: hex) else { return fallback }
+        let base = UIColor(red: rgb.red, green: rgb.green, blue: rgb.blue, alpha: 1)
+        return Color(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark ? base : base.darkenedForContrastOnWhite(3.0)
+        })
+    }
+}
+
+private extension UIColor {
+    /// Returns the receiver unchanged if it already meets `target` contrast
+    /// against white, otherwise a darker, slightly more saturated variant that
+    /// does. Hue is preserved so the color stays recognizable.
+    func darkenedForContrastOnWhite(_ target: CGFloat) -> UIColor {
+        var hue: CGFloat = 0, sat: CGFloat = 0, bri: CGFloat = 0, alpha: CGFloat = 0
+        guard getHue(&hue, saturation: &sat, brightness: &bri, alpha: &alpha) else { return self }
+        var result = self
+        var steps = 0
+        while result.contrastAgainstWhite() < target && steps < 25 {
+            bri = max(0, bri - 0.04)
+            sat = min(1, sat + 0.02)
+            result = UIColor(hue: hue, saturation: sat, brightness: bri, alpha: alpha)
+            steps += 1
+        }
+        return result
+    }
+
+    /// WCAG contrast ratio of the receiver against white (luminance 1.0).
+    func contrastAgainstWhite() -> CGFloat {
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        func channel(_ value: CGFloat) -> CGFloat {
+            value <= 0.03928 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4)
+        }
+        let luminance = 0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue)
+        return 1.05 / (luminance + 0.05)
     }
 }
