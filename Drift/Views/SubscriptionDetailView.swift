@@ -21,6 +21,11 @@ struct SubscriptionDetailView: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    /// Header icon box scales on the same ramp as its .largeTitle glyph, so the
+    /// symbol can't overflow a fixed 56-pt frame (and its background fill) and
+    /// collide with the name at large text sizes.
+    @ScaledMetric(relativeTo: .largeTitle) private var headerIconSize: CGFloat = 56
     @State private var guideStore = CancellationGuideStore()
     @State private var isEditing = false
     @State private var pauseTick = 0
@@ -110,9 +115,14 @@ struct SubscriptionDetailView: View {
                     NavigationLink {
                         CancellationGuideDetail(guide: guide)
                     } label: {
-                        HStack(spacing: DriftSpacing.s12) {
+                        // At large text sizes the label and the friction badge
+                        // would fight for width, so the row stacks vertically.
+                        let cancelRowLayout = dynamicTypeSize >= .xLarge
+                            ? AnyLayout(VStackLayout(alignment: .leading, spacing: DriftSpacing.s8))
+                            : AnyLayout(HStackLayout(spacing: DriftSpacing.s12))
+                        cancelRowLayout {
                             Label("How to cancel", systemImage: "scissors")
-                            Spacer(minLength: DriftSpacing.s8)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             DarkPatternBadge(score: guide.darkPatternScore)
                         }
                     }
@@ -206,7 +216,7 @@ struct SubscriptionDetailView: View {
                 .font(.largeTitle)
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(Color(hex: subscription.customColor))
-                .frame(width: 56, height: 56)
+                .frame(width: headerIconSize, height: headerIconSize)
                 .background(DriftTheme.neutralFill, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             VStack(alignment: .leading, spacing: DriftSpacing.s4) {
