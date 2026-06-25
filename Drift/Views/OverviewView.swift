@@ -53,6 +53,17 @@ struct OverviewView: View {
         monthlyTotal * 12
     }
 
+    /// A single spoken summary of the screen's headline numbers, so VoiceOver
+    /// reads "This month, $74.12. $889.44 per year. 5 active subscriptions." in
+    /// one stop instead of four separate fragments (label, total, year, count).
+    private var heroAccessibilityLabel: String {
+        let monthly = monthlyTotal.formatted(.currency(code: preferredCurrencyCode))
+        let yearly = yearlyTotal.formatted(.currency(code: preferredCurrencyCode))
+        let count = activeSubscriptions.count
+        let unit = count == 1 ? "subscription" : "subscriptions"
+        return "This month, \(monthly). \(yearly) per year. \(count) active \(unit)."
+    }
+
     /// Active subscriptions renewing within the next 30 days, soonest first.
     private var upcomingRenewals: [Subscription] {
         let now = Date()
@@ -127,6 +138,9 @@ struct OverviewView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, DriftSpacing.s16)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(heroAccessibilityLabel)
+        .accessibilityAddTraits(.isSummaryElement)
     }
 
     private var upcomingSection: some View {
@@ -134,6 +148,7 @@ struct OverviewView: View {
             Text("Upcoming renewals")
                 .font(DriftTypography.sectionTitle)
                 .padding(.horizontal, DriftSpacing.s16)
+                .accessibilityAddTraits(.isHeader)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: DriftSpacing.s12) {
@@ -150,6 +165,11 @@ struct OverviewView: View {
 private struct RenewalChip: View {
     let subscription: Subscription
 
+    /// Chip width scales with the user's text size so the name, date, and amount
+    /// have room at larger Dynamic Type sizes instead of clipping in a fixed box.
+    /// (Full Dynamic Type reflow across the app is handled in a later pass.)
+    @ScaledMetric private var chipWidth: CGFloat = 132
+
     /// The amount actually billed at the next renewal (full cycle price, in the
     /// subscription's own currency) — not the normalized monthly figure, so a
     /// yearly plan shows what really lands on the card.
@@ -158,6 +178,14 @@ private struct RenewalChip: View {
             forMonthlyCost: subscription.monthlyCost,
             customCycleDays: subscription.customCycleDays
         )
+    }
+
+    /// One coherent VoiceOver phrase ("PulseFit, renews June 2, $19.99") instead
+    /// of four separate stops (icon, name, date, amount), matching the rows.
+    private var accessibilityDescription: String {
+        let date = subscription.nextRenewalDate.formatted(.dateTime.month(.wide).day())
+        let charge = renewalCharge.formatted(.currency(code: subscription.currencyCode))
+        return "\(subscription.name), renews \(date), \(charge)"
     }
 
     var body: some View {
@@ -180,7 +208,9 @@ private struct RenewalChip: View {
                 .font(DriftTypography.amount)
         }
         .padding(DriftSpacing.s12)
-        .frame(width: 132, alignment: .leading)
+        .frame(width: chipWidth, alignment: .leading)
         .background(DriftTheme.neutralFill, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityDescription)
     }
 }
