@@ -35,6 +35,10 @@ struct AddSubscriptionView: View {
     @State private var startDate = Date()
     @State private var categoryID: PersistentIdentifier?
     @State private var serviceID: String?
+    /// Where the user pays for this. `.unknown` = "not sure yet" (the default),
+    /// stored as `nil` on the model so the cancel screen asks later. Optional by
+    /// design — never required to save.
+    @State private var billingChannel: BillingChannel = .unknown
 
     @State private var guideStore = CancellationGuideStore()
     @State private var isPickingService = false
@@ -144,6 +148,19 @@ struct AddSubscriptionView: View {
                         }
                     }
                 }
+
+                Section {
+                    Picker("Where you pay", selection: $billingChannel) {
+                        Text("Not sure yet").tag(BillingChannel.unknown)
+                        ForEach(BillingChannel.selectableChannels) { channel in
+                            Text(channel.displayName).tag(channel)
+                        }
+                    }
+                } header: {
+                    Text("Where you pay")
+                } footer: {
+                    Text("Optional. Apple, Google, Amazon and others each cancel in a different place, so this helps Drift show the right steps later. You can set it anytime.")
+                }
             }
             .navigationTitle(isEditing ? "Edit Subscription" : "Add Subscription")
             .navigationBarTitleDisplayMode(.inline)
@@ -217,6 +234,7 @@ struct AddSubscriptionView: View {
         startDate = existing.startDate
         categoryID = existing.category?.persistentModelID
         serviceID = existing.serviceID
+        billingChannel = existing.billingChannel ?? .unknown
 
         let perCycle = existing.billingCycle.cycleAmount(
             forMonthlyCost: existing.monthlyCost,
@@ -251,6 +269,8 @@ struct AddSubscriptionView: View {
         subscription.nextRenewalDate = renewal
         subscription.category = category
         subscription.serviceID = serviceID
+        // Store `nil` for "not sure yet" so the cancel screen knows to ask.
+        subscription.billingChannel = billingChannel == .unknown ? nil : billingChannel
 
         // New subscriptions take their look from the chosen category so the list
         // reads at a glance; editing leaves an existing icon/color untouched.

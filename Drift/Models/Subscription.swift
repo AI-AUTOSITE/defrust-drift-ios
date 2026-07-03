@@ -14,6 +14,11 @@ extension DriftSchemaV1 {
         /// Joins to a CancellationGuide entry (Part 1C), e.g. "netflix".
         /// The special value "apple-subscription" routes to showManageSubscriptions(in:).
         var serviceID: String?
+        /// Where this subscription is billed (App Store, Google Play, Amazon, …),
+        /// which decides where cancellation sends the user. Stored as a raw String
+        /// like `billingCycleRaw` so new channels need no migration; `nil` means
+        /// not set yet (treated as "ask where you subscribed"). See `BillingChannel`.
+        var billingChannelRaw: String?
         var iconName: String = "creditcard.fill" // SF Symbol name
         var customColor: String = "#5E5CE6" // hex string (systemIndigo)
 
@@ -60,6 +65,14 @@ extension DriftSchemaV1 {
         var billingCycle: BillingCycle {
             get { BillingCycle(rawValue: billingCycleRaw) ?? .monthly }
             set { billingCycleRaw = newValue.rawValue }
+        }
+
+        /// Where the user pays for this subscription. `nil` when unset. Stored as
+        /// a raw String so adding future channels needs no migration (mirrors
+        /// `billingCycle`). Drives cancellation routing — see `CancellationRouter`.
+        var billingChannel: BillingChannel? {
+            get { billingChannelRaw.flatMap(BillingChannel.init(rawValue:)) }
+            set { billingChannelRaw = newValue?.rawValue }
         }
 
         /// Non-optional access for call sites (relationships must stay optional for CloudKit).

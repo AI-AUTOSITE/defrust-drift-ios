@@ -81,6 +81,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"DesignSystem/Color+Hex.swift",
+				Models/BillingChannel.swift,
 				Models/BillingCycle.swift,
 				Models/Category.swift,
 				Models/DriftSchemaV1.swift,

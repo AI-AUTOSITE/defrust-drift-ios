@@ -52,20 +52,6 @@ struct SubscriptionDetailView: View {
         )
     }
 
-    /// The bundled cancellation guide for this service: matched by stored
-    /// serviceID when present, otherwise by an exact (case-insensitive) name
-    /// match so well-known services link up without a manual association yet.
-    private var matchedGuide: CancellationGuide? {
-        if let serviceID = subscription.serviceID, let guide = guideStore.guide(for: serviceID) {
-            return guide
-        }
-        let name = subscription.name.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { return nil }
-        return guideStore.allGuides.first {
-            $0.serviceName.localizedCaseInsensitiveCompare(name) == .orderedSame
-        }
-    }
-
     var body: some View {
         List {
             Section { header }
@@ -110,24 +96,7 @@ struct SubscriptionDetailView: View {
                 Text("A one-time nudge to cancel this if you're no longer using it. Tapping it opens the cancellation guide.")
             }
 
-            if let guide = matchedGuide {
-                Section("Cancel") {
-                    NavigationLink {
-                        CancellationGuideDetail(guide: guide)
-                    } label: {
-                        // At large text sizes the label and the friction badge
-                        // would fight for width, so the row stacks vertically.
-                        let cancelRowLayout = dynamicTypeSize >= .xLarge
-                            ? AnyLayout(VStackLayout(alignment: .leading, spacing: DriftSpacing.s8))
-                            : AnyLayout(HStackLayout(spacing: DriftSpacing.s12))
-                        cancelRowLayout {
-                            Label("How to cancel", systemImage: "scissors")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            DarkPatternBadge(score: guide.darkPatternScore)
-                        }
-                    }
-                }
-            }
+            cancelSection
 
             Section {
                 Button {
@@ -161,6 +130,77 @@ struct SubscriptionDetailView: View {
         .driftHaptic(.subscriptionPaused, trigger: pauseTick)
         .onChange(of: cancelReminderOn) { _, _ in applyCancelReminder() }
         .onChange(of: cancelReminderDate) { _, _ in applyCancelReminder() }
+    }
+
+    /// Cancel help, routed by where the user pays. The "Where you pay" picker is
+    /// always shown so the channel can be set or corrected; the guide below it
+    /// updates to match (platform steps, the service's own guide, or a prompt).
+    @ViewBuilder
+    private var cancelSection: some View {
+        Section {
+            Picker("Where you pay", selection: channelBinding) {
+                Text("Not sure yet").tag(BillingChannel.unknown)
+                ForEach(BillingChannel.selectableChannels) { channel in
+                    Text(channel.displayName).tag(channel)
+                }
+            }
+            .pickerStyle(.navigationLink)
+
+            switch CancellationRouter.route(for: subscription, in: guideStore) {
+            case .platform(let channel):
+                NavigationLink {
+                    BillingChannelGuideView(channel: channel, serviceName: subscription.name)
+                } label: {
+                    Label("How to cancel", systemImage: "scissors")
+                }
+            case .service(let guide):
+                serviceCancelLink(guide)
+            case .directGeneric:
+                NavigationLink {
+                    BillingChannelGuideView(channel: .directWeb, serviceName: subscription.name)
+                } label: {
+                    Label("How to cancel", systemImage: "scissors")
+                }
+            case .askChannel:
+                Text("Pick where you pay above to see how to cancel this.")
+                    .font(.footnote)
+                    .foregroundStyle(DriftTheme.subtleText)
+            }
+        } header: {
+            Text("Cancel")
+        } footer: {
+            Text("Where you pay decides how to cancel — Apple, Amazon and others each cancel in a different place.")
+        }
+    }
+
+    /// The service's own bundled guide, with its friction badge. At large text
+    /// sizes the label and badge stack so they don't fight for width.
+    @ViewBuilder
+    private func serviceCancelLink(_ guide: CancellationGuide) -> some View {
+        NavigationLink {
+            CancellationGuideDetail(guide: guide)
+        } label: {
+            let cancelRowLayout = dynamicTypeSize >= .xLarge
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: DriftSpacing.s8))
+                : AnyLayout(HStackLayout(spacing: DriftSpacing.s12))
+            cancelRowLayout {
+                Label("How to cancel", systemImage: "scissors")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                DarkPatternBadge(score: guide.darkPatternScore)
+            }
+        }
+    }
+
+    /// Reads/writes the subscription's billing channel. Stores `nil` for
+    /// "Not sure yet" so the router knows the channel is still unset.
+    private var channelBinding: Binding<BillingChannel> {
+        Binding(
+            get: { subscription.billingChannel ?? .unknown },
+            set: { newValue in
+                subscription.billingChannel = newValue == .unknown ? nil : newValue
+                try? context.save()
+            }
+        )
     }
 
     private var renewalLabel: String {
