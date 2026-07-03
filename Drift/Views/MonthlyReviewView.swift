@@ -43,10 +43,18 @@ struct MonthlyReviewView: View {
         case failed(DriftAIError)
     }
 
-    /// Paused subscriptions are excluded so the review matches the live spend on
-    /// Overview (a paused item is not currently billing).
+    /// Active subscriptions feed the scored "Worth a look" list. Paused ones are
+    /// handled separately (see `pausedSubscriptions`), because a paused item is
+    /// not billing now and should never appear with a savings figure.
     private var reviewable: [Subscription] {
         subscriptions.filter { !$0.isPaused }
+    }
+
+    /// Paused subscriptions get their own honest section ("you paused these,
+    /// cancel for good?") with no cost or savings numbers, since they cost
+    /// nothing while paused.
+    private var pausedSubscriptions: [Subscription] {
+        subscriptions.filter { $0.isPaused }
     }
 
     var body: some View {
@@ -87,7 +95,7 @@ struct MonthlyReviewView: View {
 
     @ViewBuilder
     private func loadedView(_ review: MonthlyReview) -> some View {
-        if review.suggestions.isEmpty {
+        if review.suggestions.isEmpty && pausedSubscriptions.isEmpty {
             ContentUnavailableView(
                 "Nothing to review",
                 systemImage: "checkmark.circle",
@@ -96,9 +104,14 @@ struct MonthlyReviewView: View {
         } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: DriftSpacing.s24) {
-                    savingsHeader(review)
-                    suggestionsList(review)
-                    disclaimer
+                    if !review.suggestions.isEmpty {
+                        savingsHeader(review)
+                        suggestionsList(review)
+                        disclaimer
+                    }
+                    if !pausedSubscriptions.isEmpty {
+                        pausedList
+                    }
                 }
                 .padding(.horizontal, DriftSpacing.s16)
                 .padding(.vertical, DriftSpacing.s24)
@@ -188,6 +201,29 @@ struct MonthlyReviewView: View {
             .padding(.top, DriftSpacing.s4)
     }
 
+    /// Paused subscriptions, framed honestly (no savings — they cost nothing
+    /// while paused). Each links to its detail so the user can cancel for good.
+    private var pausedList: some View {
+        VStack(alignment: .leading, spacing: DriftSpacing.s12) {
+            Text("Paused")
+                .font(DriftTypography.sectionTitle)
+                .accessibilityAddTraits(.isHeader)
+            Text("You paused these. Cancel for good if you're done with them?")
+                .font(.subheadline)
+                .foregroundStyle(DriftTheme.subtleText)
+
+            VStack(spacing: DriftSpacing.s8) {
+                ForEach(pausedSubscriptions, id: \.persistentModelID) { subscription in
+                    NavigationLink(value: subscription) {
+                        PausedRow(subscription: subscription)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Opens subscription details")
+                }
+            }
+        }
+    }
+
     // MARK: - Review execution
 
     private func displayAmount(fromUSD usd: Double) -> Decimal {
@@ -269,6 +305,50 @@ private struct SuggestionRow: View {
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText)
+    }
+}
+
+// MARK: - Paused row
+
+private struct PausedRow: View {
+    let subscription: Subscription
+
+    private var statusText: String {
+        if let until = subscription.pausedUntil {
+            return "Paused until \(until.formatted(.dateTime.month().day()))"
+        }
+        return "Paused"
+    }
+
+    var body: some View {
+        HStack(spacing: DriftSpacing.s12) {
+            Image(systemName: subscription.iconName)
+                .font(.title3)
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(Color.categoryTint(hex: subscription.customColor))
+
+            VStack(alignment: .leading, spacing: DriftSpacing.s2) {
+                Text(subscription.name)
+                    .font(.headline)
+                Text(statusText)
+                    .font(.subheadline)
+                    .foregroundStyle(DriftTheme.subtleText)
+            }
+
+            Spacer(minLength: DriftSpacing.s8)
+
+            Image(systemName: "pause.circle")
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(DriftTheme.subtleText)
+        }
+        .padding(DriftSpacing.s16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: DriftRadius.l, style: .continuous)
+                .fill(DriftTheme.neutralFill)
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(subscription.name). \(statusText).")
     }
 }
 
