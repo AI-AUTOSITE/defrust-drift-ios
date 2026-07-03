@@ -9,6 +9,9 @@
 //  in the next 30 days. Charts, "vs. last month" and the Pro savings card
 //  come later.
 //
+//  A "Monthly review" card opens the on-device review of which subscriptions
+//  are worth cancelling (see MonthlyReviewView).
+//
 
 import SwiftData
 import SwiftUI
@@ -24,6 +27,7 @@ struct OverviewView: View {
     @AppStorage("preferredCurrencyCode") private var preferredCurrencyCode = "USD"
 
     @State private var isShowingSettings = false
+    @State private var isShowingReview = false
 
     /// Paused subscriptions are excluded, as is any subscription currently in
     /// its swipe-delete undo window (so the total drops immediately, then comes
@@ -89,6 +93,7 @@ struct OverviewView: View {
                 }
             }
             .navigationTitle("Overview")
+            .subscriptionDetailDestination()
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -102,6 +107,10 @@ struct OverviewView: View {
                 SettingsView()
                     .presentationDragIndicator(.visible)
             }
+            .sheet(isPresented: $isShowingReview) {
+                MonthlyReviewView()
+                    .presentationDragIndicator(.visible)
+            }
         }
     }
 
@@ -109,6 +118,7 @@ struct OverviewView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: DriftSpacing.s32) {
                 hero
+                reviewCard
                 if !upcomingRenewals.isEmpty {
                     upcomingSection
                 }
@@ -143,6 +153,49 @@ struct OverviewView: View {
         .accessibilityAddTraits(.isSummaryElement)
     }
 
+    /// Entry point to the monthly review. A single calm tap — the review runs
+    /// on-device and works on every iPhone.
+    private var reviewCard: some View {
+        Button {
+            isShowingReview = true
+        } label: {
+            HStack(spacing: DriftSpacing.s12) {
+                Image(systemName: "list.bullet.clipboard")
+                    .font(.title3)
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(DriftTheme.accent)
+
+                VStack(alignment: .leading, spacing: DriftSpacing.s2) {
+                    Text("Monthly review")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Text("See which subscriptions are worth a look")
+                        .font(.subheadline)
+                        .foregroundStyle(DriftTheme.subtleText)
+                        .multilineTextAlignment(.leading)
+                }
+
+                Spacer(minLength: DriftSpacing.s8)
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(DriftTheme.subtleText)
+            }
+            .padding(DriftSpacing.s16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: DriftRadius.l, style: .continuous)
+                    .fill(DriftTheme.neutralFill)
+            )
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, DriftSpacing.s16)
+        .driftHaptic(.navigationLight, trigger: isShowingReview)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Monthly review. See which subscriptions are worth a look.")
+        .accessibilityAddTraits(.isButton)
+    }
+
     private var upcomingSection: some View {
         VStack(alignment: .leading, spacing: DriftSpacing.s12) {
             Text("Upcoming renewals")
@@ -153,7 +206,11 @@ struct OverviewView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: DriftSpacing.s12) {
                     ForEach(upcomingRenewals, id: \.persistentModelID) { subscription in
-                        RenewalChip(subscription: subscription)
+                        NavigationLink(value: subscription) {
+                            RenewalChip(subscription: subscription)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityHint("Opens subscription details")
                     }
                 }
                 .padding(.horizontal, DriftSpacing.s16)
