@@ -295,6 +295,12 @@ struct CancellationGuideDetail: View {
                     Text("Opens Subscriptions in the App Store — find \(guide.serviceName) to cancel.")
                 }
             }
+
+            Section {
+                Text("Steps last verified \(guide.lastVerifiedDate).")
+                    .font(.caption)
+                    .foregroundStyle(DriftTheme.subtleText)
+            }
         }
         .navigationTitle(guide.serviceName)
         .navigationBarTitleDisplayMode(.inline)
