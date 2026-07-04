@@ -317,6 +317,9 @@ private struct PausedRow: View {
         if let until = subscription.pausedUntil {
             return "Paused until \(until.formatted(.dateTime.month().day()))"
         }
+        if let since = subscription.pausedDate {
+            return "Paused since \(since.formatted(.dateTime.month().day()))"
+        }
         return "Paused"
     }
 

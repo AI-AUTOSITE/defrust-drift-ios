@@ -242,10 +242,7 @@ struct SubscriptionDetailView: View {
 
     private func togglePause() {
         pauseTick += 1
-        subscription.isPaused.toggle()
-        if !subscription.isPaused {
-            subscription.pausedUntil = nil
-        }
+        subscription.applyPause(!subscription.isPaused)
         try? context.save()
         WidgetCenter.shared.reloadAllTimelines()
     }

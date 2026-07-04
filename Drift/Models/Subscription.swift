@@ -45,6 +45,10 @@ extension DriftSchemaV1 {
         // MARK: - State
         var isPaused: Bool = false
         var pausedUntil: Date?
+        /// When the subscription was paused (set by `applyPause`). `nil` when
+        /// active, or for subscriptions paused before this field existed.
+        /// Optional so CloudKit can add it without a heavyweight migration.
+        var pausedDate: Date?
         var lastUsedDate: Date?
         /// "daily" / "weekly" / "monthly" / "rarely" / "never"
         var frequencyTag: String?
@@ -82,6 +86,21 @@ extension DriftSchemaV1 {
 
         var unwrappedNotifications: [RenewalNotification] {
             notifications ?? []
+        }
+
+        // MARK: - Mutations
+        /// Pause or resume the subscription, keeping the three pause fields
+        /// consistent: pausing stamps `pausedDate` with now; resuming clears both
+        /// `pausedDate` and any scheduled `pausedUntil`. Call this from every
+        /// pause entry point so no field is left stale.
+        func applyPause(_ paused: Bool) {
+            isPaused = paused
+            if paused {
+                pausedDate = Date()
+            } else {
+                pausedDate = nil
+                pausedUntil = nil
+            }
         }
 
         // MARK: - Init
