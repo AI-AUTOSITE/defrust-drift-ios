@@ -286,12 +286,13 @@ struct CancellationGuideDetail: View {
                         Label("Open cancellation page", systemImage: "arrow.up.right.square")
                     }
                 }
-            } else if guide.appleBilledOption {
+            } else if guide.appleBilledOption, let appleURL = BillingChannel.appleAppStore.managementURL {
                 Section {
-                    Label("Billed by Apple — cancel in Settings › Subscriptions",
-                          systemImage: "apple.logo")
-                        .font(.footnote)
-                        .foregroundStyle(DriftTheme.subtleText)
+                    ExternalLinkButton(url: appleURL) {
+                        Label("Open Subscriptions to cancel", systemImage: "apple.logo")
+                    }
+                } footer: {
+                    Text("Opens Subscriptions in the App Store — find \(guide.serviceName) to cancel.")
                 }
             }
         }
