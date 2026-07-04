@@ -57,6 +57,29 @@ struct MonthlyReviewView: View {
         subscriptions.filter { $0.isPaused }
     }
 
+    /// Everything the review is computed from. When any of these change — a row
+    /// deleted or added, a price/usage/category edit, or a pause toggle — the
+    /// `.task` below re-runs and the list rebuilds. Without this the review kept
+    /// its first snapshot, so a subscription deleted from its detail screen
+    /// lingered as a dead row until the sheet was reopened. `attempt` is folded
+    /// in so the "Try again" action still forces a fresh run.
+    private var reviewInputs: Int {
+        var hasher = Hasher()
+        hasher.combine(attempt)
+        for sub in reviewable {
+            hasher.combine(sub.id)
+            hasher.combine(sub.name)
+            hasher.combine(sub.monthlyCost)
+            hasher.combine(sub.currencyCode)
+            hasher.combine(sub.lastUsedDate)
+            hasher.combine(sub.frequencyTag)
+            hasher.combine(sub.startDate)
+            hasher.combine(sub.category?.name)
+        }
+        hasher.combine(pausedSubscriptions.count)
+        return hasher.finalize()
+    }
+
     var body: some View {
         NavigationStack {
             Group {
@@ -78,7 +101,7 @@ struct MonthlyReviewView: View {
                 }
             }
         }
-        .task(id: attempt) { await runReview() }
+        .task(id: reviewInputs) { await runReview() }
     }
 
     // MARK: - Phase views

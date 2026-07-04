@@ -100,7 +100,7 @@
     "serviceName": "Amazon Prime Video",
     "category": "Streaming",
     "regionAvailability": ["US","UK","CA","AU"],
-    "primaryCancelURL": "https://www.primevideo.com/account",
+    "primaryCancelURL": "https://www.primevideo.com/settings",
     "appleBilledOption": false,
     "steps": [
       {"order":1,"action":"Visit primevideo.com/account and sign in.","supportingNote":null},
@@ -110,7 +110,7 @@
       {"order":5,"action":"Confirm on the final screen and save the email confirmation.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 10,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 8,
     "warningNote": "Amazon's cancellation UX is the same family criticised in the FTC's Prime case (settled for $2.5 billion on Sept 25, 2025; $1B civil penalty + $1.5B consumer redress to an estimated 35 million customers). Expect multiple confirm screens.",
     "notes": null
@@ -288,7 +288,7 @@
     "serviceName": "Audible",
     "category": "Music",
     "regionAvailability": ["US","UK","CA","AU"],
-    "primaryCancelURL": "https://www.audible.com/account/cancel-membership",
+    "primaryCancelURL": "https://www.audible.com/account",
     "appleBilledOption": false,
     "steps": [
       {"order":1,"action":"BEFORE cancelling: spend or download all your unused credits — they expire at the end of the final billing period.","supportingNote":"Per Audible help: any title bought with a credit is yours to keep forever, but unused credits are forfeited at the end of the final billing cycle (except App Store / Google Play subscribers, whose credits do not expire)."},
@@ -299,7 +299,7 @@
       {"order":6,"action":"Save the email confirmation.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 10,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 7,
     "warningNote": "Unused credits are forfeited on cancellation (except App Store / Google Play subscribers). Spend them first. The Audible mobile app cannot cancel — browser only.",
     "notes": null
@@ -320,7 +320,7 @@
       {"order":6,"action":"Verify on your next statement that no further charges appear.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 15,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 9,
     "warningNote": "On November 21, 2024, New York Supreme Court Justice Lyle Frank ruled in People of the State of New York v. Sirius XM Radio Inc. (Index No. 453325/2023) that SiriusXM violated the federal Restore Online Shoppers' Confidence Act (ROSCA). Frank wrote: 'their cancellation procedure is clearly not as easy to use as the initiation method.' New York subscribers can now self-serve online; outside NY the flow may still require a live agent. Be patient and assertive.",
     "notes": null
@@ -398,7 +398,7 @@
       {"order":6,"action":"Confirm cancellation and save the email with the final billed amount.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 10,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 9,
     "warningNote": "On March 13, 2026, the U.S. Department of Justice announced a $150 million stipulated order against Adobe — $75 million in civil penalties paid to the U.S. Treasury and $75 million in free services for qualifying customers — over hidden ETFs and difficult cancellation. The complaint also named two Adobe executives personally: David Wadhwani (president, digital media) and Maninder Sawhney (VP). The 50% ETF (annual-paid-monthly) still exists. Cancel within the first 14 days for a full refund. Verify your plan type before pressing cancel.",
     "notes": null
@@ -513,7 +513,7 @@
       {"order":6,"action":"For Organization or Enterprise plans, email support@figma.com at least 30 days before the renewal date.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 10,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 7,
     "warningNote": "The Cancel button is hidden in Admin → Settings → Plan, NOT in the Billing tab. Figma payments are non-refundable; prorated seat charges may appear on the final invoice.",
     "notes": null
@@ -626,7 +626,7 @@
       {"order":5,"action":"Ask for a written confirmation in the chat transcript and a confirmation email.","supportingNote":"Screenshot the transcript."}
     ],
     "estimatedTimeMinutes": 8,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 8,
     "warningNote": "Outside California, NYT may require live-chat cancellation with multi-step retention. California subscribers have 24/7 self-serve online cancellation, partly as a result of the $2,375,000 class settlement in Moses et al v. The New York Times Co., which the Second Circuit upheld on February 10, 2026 (per Law360: 'A Second Circuit panel on Tuesday upheld a class action settlement resolving claims that The New York Times Co. auto-renewed California users' subscriptions without proper notice.'). Always obtain a written confirmation.",
     "notes": null
@@ -655,7 +655,7 @@
     "serviceName": "Financial Times",
     "category": "News",
     "regionAvailability": ["US","UK","CA","AU"],
-    "primaryCancelURL": "https://myaccount.ft.com/account-management/cancel/index",
+    "primaryCancelURL": "https://www.ft.com/myaccount",
     "appleBilledOption": false,
     "steps": [
       {"order":1,"action":"Open myaccount.ft.com/account-management/cancel/index and sign in.","supportingNote":null},
@@ -664,7 +664,7 @@
       {"order":4,"action":"Confirm cancellation and save the email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 10,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 8,
     "warningNote": "FT runs a documented 'save me' retention journey with FOMO copy and a price freeze. The flow is online (no phone required), but expect multiple screens. EU/UK subscribers have a 14-day cooling-off right.",
     "notes": null
@@ -693,7 +693,7 @@
     "serviceName": "Bloomberg",
     "category": "News",
     "regionAvailability": ["US","UK","CA","AU"],
-    "primaryCancelURL": "https://www.bloomberg.com/account/subscription",
+    "primaryCancelURL": "https://www.bloomberg.com/account",
     "appleBilledOption": false,
     "steps": [
       {"order":1,"action":"Open bloomberg.com/account/subscription and sign in.","supportingNote":null},
@@ -703,7 +703,7 @@
       {"order":5,"action":"Get written confirmation.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 8,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 7,
     "warningNote": "The web 'Cancel Subscription' button is frequently missing or disabled. Bloomberg routes many users to chat (Messaging Assistant), email (contactus@bloombergsupport.com), or phone (1-212-318-2000). No prorated refunds.",
     "notes": null
@@ -835,7 +835,7 @@
       {"order":5,"action":"Confirm.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 8,
     "warningNote": "Ultimate price was raised from $19.99 to $29.99/mo effective October 1, 2025 — a 50% jump that triggered mass cancellations. Under new Microsoft Gaming chief Asha Sharma (former Meta VP who replaced Phil Spencer in February 2026), Microsoft walked the price back to $22.99/mo on April 21, 2026 (per Xbox Wire: 'Starting today, Game Pass Ultimate drops from $29.99 to $22.99 a month.'). If you cancel your current grandfathered rate and try to resubscribe later, you may not get the same price back. Decide deliberately.",
     "notes": null
@@ -896,7 +896,7 @@
       {"order":7,"action":"Save the email confirmation.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 10,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 8,
     "warningNote": "On September 25, 2025, in the U.S. District Court for the Western District of Washington, Judge John H. Chun entered a $2.5 billion FTC order against Amazon — $1 billion civil penalty (the largest ever obtained for an FTC rule violation) plus $1.5 billion in consumer redress to an estimated 35 million customers — over the 'Iliad' cancellation flow. Per the order, Amazon must simplify cancellation, but the multi-screen flow is still in force as of May 2026; expect 4-6 confirmation screens.",
     "notes": null
@@ -955,7 +955,7 @@
       {"order":6,"action":"Verify your next statement; dispute any post-cancel charges with your card issuer.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 15,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-04",
     "darkPatternScore": 9,
     "warningNote": "Per FTC press release (December 15, 2025) and Uber, FTC v. (Case No. 2423092, N.D. Cal.), the FTC and 21 state attorneys general filed an Amended Complaint alleging Uber One's cancellation flow can require 'as many as 23 separate screens and... up to 32 distinct actions' to finalize, particularly within 48 hours of renewal. A Second Amended Complaint was filed May 4, 2026; the case is ongoing. Cancel days in advance.",
     "notes": null
