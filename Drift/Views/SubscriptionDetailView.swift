@@ -178,7 +178,7 @@ struct SubscriptionDetailView: View {
     @ViewBuilder
     private func serviceCancelLink(_ guide: CancellationGuide) -> some View {
         NavigationLink {
-            CancellationGuideDetail(guide: guide)
+            CancellationGuideDetail(guide: guide, isStale: guideStore.isStale(guide))
         } label: {
             let cancelRowLayout = dynamicTypeSize >= .xLarge
                 ? AnyLayout(VStackLayout(alignment: .leading, spacing: DriftSpacing.s8))

@@ -43,7 +43,7 @@ struct CancelGuidesView: View {
                     }
                 }
                 .navigationDestination(for: CancellationGuide.self) { guide in
-                    CancellationGuideDetail(guide: guide)
+                    CancellationGuideDetail(guide: guide, isStale: store.isStale(guide))
                 }
         }
         .task {
@@ -248,6 +248,10 @@ private struct CancelGuideRow: View {
 /// detail screen can reuse it when a subscription matches a known service.
 struct CancellationGuideDetail: View {
     let guide: CancellationGuide
+    /// Whether this guide is past its re-verification window (computed by the
+    /// store when the row is opened). Drives the quiet per-guide "may be out of
+    /// date" note, matching the list-level StalenessBanner.
+    let isStale: Bool
 
     var body: some View {
         List {
@@ -300,6 +304,16 @@ struct CancellationGuideDetail: View {
                 Text("Steps last verified \(guide.lastVerifiedDate).")
                     .font(.caption)
                     .foregroundStyle(DriftTheme.subtleText)
+                if isStale {
+                    Label {
+                        Text("Not checked recently — double-check on \(guide.serviceName)'s site.")
+                            .foregroundStyle(DriftTheme.subtleText)
+                    } icon: {
+                        Image(systemName: "clock.badge.exclamationmark")
+                            .foregroundStyle(DriftTheme.warningSoft)
+                    }
+                    .font(.caption)
+                }
             }
         }
         .navigationTitle(guide.serviceName)
