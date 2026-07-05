@@ -658,7 +658,7 @@
     "primaryCancelURL": "https://www.ft.com/myaccount",
     "appleBilledOption": false,
     "steps": [
-      {"order":1,"action":"Open myaccount.ft.com/account-management/cancel/index and sign in.","supportingNote":null},
+      {"order":1,"action":"Open ft.com/myaccount and sign in, then start the cancellation from your account page.","supportingNote":null},
       {"order":2,"action":"Click through the 'save me' journey: FT will show FOMO messaging (value of brand) and a price-freeze offer.","supportingNote":"Per FT Strategies (the Financial Times's own consulting arm, ftstrategies.com): 'This new journey yielded a more positive save rate of 6% (doubled compared with the previous 3% save rate).'"},
       {"order":3,"action":"Decline each save offer.","supportingNote":null},
       {"order":4,"action":"Confirm cancellation and save the email.","supportingNote":null}
@@ -735,7 +735,7 @@
     "primaryCancelURL": "https://account.onepeloton.com/mymembership",
     "appleBilledOption": false,
     "steps": [
-      {"order":1,"action":"Open members.onepeloton.com/account/subscriptions and sign in.","supportingNote":null},
+      {"order":1,"action":"Open account.onepeloton.com/mymembership and sign in.","supportingNote":null},
       {"order":2,"action":"Tap 'Cancel Membership' next to App Membership.","supportingNote":null},
       {"order":3,"action":"Confirm and save the email.","supportingNote":null}
     ],
