@@ -13,7 +13,7 @@
       {"order":4,"action":"Check your email for the cancellation confirmation.","supportingNote":"Keep this for your records."}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 2,
     "warningNote": null,
     "notes": "Profiles and viewing history are retained for 10 months in case you restart."
@@ -32,7 +32,7 @@
       {"order":4,"action":"Select a reason and confirm.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": "Cancelling the Disney Bundle also cancels Hulu and ESPN+. If you want to keep one, cancel the bundle and re-subscribe to the standalone service afterwards.",
     "notes": null
@@ -52,7 +52,7 @@
       {"order":5,"action":"Tap 'Cancel Subscription' on the final screen and confirm.","supportingNote":"You should receive a confirmation email."}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 5,
     "warningNote": "Multi-stage retention: pause (up to 12 weeks) → bundle upsell → retention discount. No prorated refunds; access continues to end of cycle.",
     "notes": "If billed through a third party (Roku, Amazon, Apple), cancel there instead."
@@ -72,7 +72,7 @@
       {"order":5,"action":"Confirm cancellation and save the confirmation email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 4,
     "warningNote": "If Max came via a bundle (e.g. Cricket Wireless, AT&T), cancellation must happen at the origin provider, not Max.com.",
     "notes": null
@@ -90,7 +90,7 @@
       {"order":3,"action":"Tap 'Cancel Subscription' and confirm.","supportingNote":"You retain access until the period end."}
     ],
     "estimatedTimeMinutes": 2,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 1,
     "warningNote": null,
     "notes": "Apple often offers 3 free months on cancel attempt — accept only if you actually want to keep watching."
@@ -129,7 +129,7 @@
       {"order":4,"action":"Select a reason and confirm cancellation.","supportingNote":"Access continues until the end of the current period."}
     ],
     "estimatedTimeMinutes": 4,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": null,
     "notes": "If bundled via Walmart+, you cancel the bundle on walmart.com (separate flow)."
@@ -148,7 +148,7 @@
       {"order":4,"action":"Confirm cancellation; save the email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 2,
     "warningNote": null,
     "notes": null
@@ -168,7 +168,7 @@
       {"order":5,"action":"Check email for confirmation.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 4,
     "warningNote": null,
     "notes": "If billed via iTunes/Google Play, cancel there. The Crunchyroll site cannot cancel store-billed subscriptions."
@@ -186,7 +186,7 @@
       {"order":3,"action":"Confirm cancellation and save the confirmation email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 5,
     "warningNote": "BritBox does NOT support cancellation from the iOS or smart-TV app. You must use a browser. No prorated refunds are issued for unused portions of the billing period.",
     "notes": "If you subscribed via Amazon Prime Video Channels, Roku or Apple, cancel at the source platform."
@@ -204,7 +204,7 @@
       {"order":3,"action":"Confirm cancellation; the screen will show your access-end date.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 2,
     "warningNote": null,
     "notes": "Stan is Australia-only. No prorated refunds, but cancellation is straightforward."
@@ -223,7 +223,7 @@
       {"order":4,"action":"Save the confirmation email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 4,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": null,
     "notes": "If Crave is bundled into your Bell TV/Internet plan, cancellation must go through Bell support, not the web portal."
@@ -242,7 +242,7 @@
       {"order":4,"action":"Save the confirmation; you keep Premium until period end.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 2,
     "warningNote": null,
     "notes": "For Family or Duo plans, only the plan manager can cancel. Members can leave individually via account settings."
@@ -260,7 +260,7 @@
       {"order":3,"action":"Confirm.","supportingNote":"Your downloaded library becomes unplayable after the period end."}
     ],
     "estimatedTimeMinutes": 2,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 1,
     "warningNote": null,
     "notes": null
@@ -278,7 +278,7 @@
       {"order":3,"action":"Choose a reason and confirm.","supportingNote":"You retain Premium until period end."}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 2,
     "warningNote": null,
     "notes": "If billed via Apple (subscribed in the iOS YouTube app), cancel through Apple Subscriptions instead."
@@ -339,7 +339,7 @@
       {"order":4,"action":"Confirm; the downgrade takes effect at the end of the current cycle.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 2,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 1,
     "warningNote": "If your iCloud data exceeds 5 GB at downgrade time, photos and backups stop syncing immediately at period end. Organize data first.",
     "notes": null
@@ -358,7 +358,7 @@
       {"order":4,"action":"Confirm cancellation.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 2,
     "warningNote": null,
     "notes": "If billed via Apple, cancel through Subscriptions on iOS instead. Family-shared storage drops to the 15 GB tier on cancellation."
@@ -377,7 +377,7 @@
       {"order":4,"action":"Confirm.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 2,
     "warningNote": "Cancelling Apple One ends Apple Music, Apple TV+, Arcade, iCloud+, Fitness+ and News+ together. Use 'Choose Individual Services' to keep specific items.",
     "notes": null
@@ -416,7 +416,7 @@
       {"order":3,"action":"Confirm the cancellation reason and save the email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 4,
     "warningNote": null,
     "notes": "Family sharing: only the subscription owner can cancel; other members lose access at period end."
@@ -435,7 +435,7 @@
       {"order":4,"action":"Save the email confirmation.","supportingNote":"Files over the free 2 GB limit go read-only until you free up space."}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 4,
     "warningNote": null,
     "notes": null
@@ -454,7 +454,7 @@
       {"order":4,"action":"After period end the account enters 'frozen' state: you can view and copy items but cannot add or edit.","supportingNote":"Per 1Password support: 'you can still view all your items, copy your passwords, and even copy items to vaults outside your account.'"}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 2,
     "warningNote": "After cancellation your account is 'frozen' — effectively read-only. You can sign in and view/export data indefinitely but cannot make changes. Export to a successor manager BEFORE the freeze if migrating.",
     "notes": null
@@ -473,7 +473,7 @@
       {"order":4,"action":"Confirm; the workspace downgrades to the Free plan at period end.","supportingNote":"Block limits return for some legacy workspaces."}
     ],
     "estimatedTimeMinutes": 4,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": null,
     "notes": null
@@ -492,7 +492,7 @@
       {"order":4,"action":"Save the confirmation email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": "Linear does NOT provide mid-cycle refunds. Per Linear docs: 'We do not provide refunds for cancellations mid-subscription.' Cancel before the next renewal date.",
     "notes": null
@@ -523,7 +523,7 @@
     "serviceName": "GitHub Copilot",
     "category": "SaaS",
     "regionAvailability": ["US","UK","CA","AU"],
-    "primaryCancelURL": "https://github.com/settings/billing",
+    "primaryCancelURL": "https://github.com/settings/copilot",
     "appleBilledOption": false,
     "steps": [
       {"order":1,"action":"Open github.com/settings/billing and sign in.","supportingNote":null},
@@ -532,7 +532,7 @@
       {"order":4,"action":"Confirm and save the email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 6,
     "warningNote": null,
     "notes": "Organization-billed Copilot must be cancelled by the org admin in Settings → Billing → Copilot. Individual cancellation via personal Settings does not affect org seats."
@@ -551,7 +551,7 @@
       {"order":4,"action":"Confirm.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 2,
     "warningNote": null,
     "notes": null
@@ -569,7 +569,7 @@
       {"order":3,"action":"Confirm.","supportingNote":"Access continues to period end."}
     ],
     "estimatedTimeMinutes": 2,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 1,
     "warningNote": null,
     "notes": "iOS subscribers cancel through Apple Subscriptions instead."
@@ -587,7 +587,7 @@
       {"order":3,"action":"Confirm.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 3,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 2,
     "warningNote": null,
     "notes": "If your plan was provided via a partner promotion (e.g., a phone carrier), cancellation happens at the partner."
@@ -606,7 +606,7 @@
       {"order":4,"action":"Save the Stripe email receipt.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 4,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": null,
     "notes": null
@@ -645,7 +645,7 @@
       {"order":4,"action":"Save the confirmation email; verify next statement.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 8,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 6,
     "warningNote": null,
     "notes": "If your WSJ subscription is bundled with Barron's or MarketWatch via the All Access plan, cancellation applies to all bundled products."
@@ -683,7 +683,7 @@
       {"order":4,"action":"Save the email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 4,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": null,
     "notes": null
@@ -722,7 +722,7 @@
       {"order":4,"action":"Save the email confirmation.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 4,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": null,
     "notes": null
@@ -732,7 +732,7 @@
     "serviceName": "Peloton App",
     "category": "Fitness",
     "regionAvailability": ["US","UK","CA","AU"],
-    "primaryCancelURL": "https://members.onepeloton.com/account/subscriptions",
+    "primaryCancelURL": "https://account.onepeloton.com/mymembership",
     "appleBilledOption": false,
     "steps": [
       {"order":1,"action":"Open members.onepeloton.com/account/subscriptions and sign in.","supportingNote":null},
@@ -740,7 +740,7 @@
       {"order":3,"action":"Confirm and save the email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 4,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": null,
     "notes": "If your Peloton subscription is the All-Access Membership tied to Bike/Tread/Row hardware, you cannot cancel while you own the connected device; only the Peloton App membership is self-serve."
@@ -758,7 +758,7 @@
       {"order":3,"action":"Confirm.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 2,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 1,
     "warningNote": "If you have Apple One Premier, Fitness+ cannot be cancelled independently — use Apple One's 'Choose Individual Services' to keep Music/TV+ and drop Fitness+.",
     "notes": null
@@ -777,7 +777,7 @@
       {"order":4,"action":"Confirm.","supportingNote":"You keep premium features until period end."}
     ],
     "estimatedTimeMinutes": 4,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": "Per Strava support: 'You may be eligible for a full refund within 14 days of purchase. After 14 days, Strava subscriptions are non-refundable.' iOS-billed subscriptions must be cancelled via Apple Subscriptions.",
     "notes": null
@@ -794,7 +794,7 @@
       {"order":2,"action":"To stop using NTC: just delete the app from your phone.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 0,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 1,
     "warningNote": null,
     "notes": "Nike removed all paid tiers in April 2020. If users see this entry in Drift's tracker they likely mis-tagged another subscription."
@@ -815,7 +815,7 @@
       {"order":6,"action":"Get a written confirmation by email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 5,
     "warningNote": "Whoop has a hard 12- or 24-month commitment. Cancelling mid-commitment requires paying out the remaining contract balance. Pausing is offered for injury, travel, or financial breaks.",
     "notes": null
@@ -855,7 +855,7 @@
       {"order":5,"action":"Confirm.","supportingNote":"After lapse, Essential monthly games become inaccessible; Extra/Premium catalog also locks."}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 6,
     "warningNote": "Strict 14-day refund window. Free monthly games (Essential tier) and the Extra/Premium game catalogs become inaccessible immediately after the subscription ends, even though you 'claimed' them.",
     "notes": null
@@ -874,7 +874,7 @@
       {"order":4,"action":"Confirm.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 4,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 5,
     "warningNote": "No refunds. Per Nintendo Support: 'If a Nintendo Switch Online membership expires, users won't be able to access their Save Data Cloud backups. However, Nintendo will allow users who resubscribe within 180 days to access their previous Save Data Cloud backups.' Auto-renewal cannot be re-enabled once disabled — you must repurchase a new term.",
     "notes": null
@@ -915,7 +915,7 @@
       {"order":4,"action":"Confirm cancellation; save the email.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 5,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 4,
     "warningNote": "The bundled Paramount+ Essential perk is included with Walmart+. Cancelling Walmart+ stops the perk at period end. Refunds only within 15 days of signup with unused benefits.",
     "notes": null
@@ -925,7 +925,7 @@
     "serviceName": "DoorDash DashPass",
     "category": "E-commerce",
     "regionAvailability": ["US","UK","CA","AU"],
-    "primaryCancelURL": "https://www.doordash.com/consumer/manage_membership/",
+    "primaryCancelURL": "https://www.doordash.com/dashpass",
     "appleBilledOption": false,
     "steps": [
       {"order":1,"action":"Open doordash.com/consumer/manage_membership and sign in.","supportingNote":null},
@@ -934,7 +934,7 @@
       {"order":4,"action":"Confirm.","supportingNote":null}
     ],
     "estimatedTimeMinutes": 4,
-    "lastVerifiedDate": "2026-05-27",
+    "lastVerifiedDate": "2026-07-05",
     "darkPatternScore": 3,
     "warningNote": null,
     "notes": "If subscribed via the iOS app via Apple billing, cancel through Apple Subscriptions."
