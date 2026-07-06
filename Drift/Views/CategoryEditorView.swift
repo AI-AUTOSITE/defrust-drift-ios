@@ -2,10 +2,10 @@
 //  CategoryEditorView.swift
 //  Drift
 //
-//  A small sheet for creating a custom category: a name, an icon from a
-//  curated SF Symbol grid, and a color. The result is a normal Category model,
-//  so any subscription assigned to it inherits its icon and color exactly like
-//  the built-in categories do.
+//  A small sheet for creating or editing a custom category: a name, an icon
+//  from a curated SF Symbol grid, and a color. The result is a normal Category
+//  model, so any subscription assigned to it inherits its icon and color
+//  exactly like the built-in categories do.
 //
 
 import SwiftData
@@ -16,12 +16,16 @@ struct CategoryEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \Category.sortOrder) private var categories: [Category]
 
-    /// Called with the newly created category so the caller can select it.
-    let onCreate: (Category) -> Void
+    /// The category to edit, or nil to create a new one.
+    var editing: Category?
+    /// Called with the newly created category (create mode only).
+    var onCreate: (Category) -> Void = { _ in }
 
     @State private var name = ""
     @State private var iconSymbol = "star.fill"
     @State private var colorHex = "#0A84FF"
+
+    private var isEditing: Bool { editing != nil }
 
     private var trimmedName: String {
         name.trimmingCharacters(in: .whitespaces)
@@ -42,7 +46,7 @@ struct CategoryEditorView: View {
                     colorGrid
                 }
             }
-            .navigationTitle("New Category")
+            .navigationTitle(isEditing ? "Edit Category" : "New Category")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -54,6 +58,7 @@ struct CategoryEditorView: View {
                         .disabled(trimmedName.isEmpty)
                 }
             }
+            .onAppear(perform: loadIfEditing)
         }
     }
 
@@ -107,17 +112,30 @@ struct CategoryEditorView: View {
         .padding(.vertical, DriftSpacing.s4)
     }
 
+    private func loadIfEditing() {
+        guard let editing else { return }
+        name = editing.name
+        iconSymbol = editing.iconSymbol
+        colorHex = editing.colorHex
+    }
+
     private func save() {
-        let nextOrder = (categories.map(\.sortOrder).max() ?? 0) + 1
-        let category = Category(
-            name: trimmedName,
-            colorHex: colorHex,
-            iconSymbol: iconSymbol,
-            sortOrder: nextOrder
-        )
-        context.insert(category)
+        if let editing {
+            editing.name = trimmedName
+            editing.iconSymbol = iconSymbol
+            editing.colorHex = colorHex
+        } else {
+            let nextOrder = (categories.map(\.sortOrder).max() ?? 0) + 1
+            let category = Category(
+                name: trimmedName,
+                colorHex: colorHex,
+                iconSymbol: iconSymbol,
+                sortOrder: nextOrder
+            )
+            context.insert(category)
+            onCreate(category)
+        }
         try? context.save()
-        onCreate(category)
         dismiss()
     }
 

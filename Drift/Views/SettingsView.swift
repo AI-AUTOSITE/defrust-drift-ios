@@ -37,6 +37,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 displaySection
+                categoriesSection
                 proSection
                 aboutSection
                 #if DEBUG
@@ -76,6 +77,16 @@ struct SettingsView: View {
     }
 
     // MARK: - Drift Pro
+
+    private var categoriesSection: some View {
+        Section {
+            NavigationLink {
+                CategoryManagerView()
+            } label: {
+                Label("Manage categories", systemImage: "square.grid.2x2")
+            }
+        }
+    }
 
     private var proSection: some View {
         Section("Drift Pro") {

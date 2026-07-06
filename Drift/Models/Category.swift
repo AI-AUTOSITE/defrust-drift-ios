@@ -72,6 +72,10 @@ extension Category {
     /// tests track the preset list automatically instead of hard-coding a count.
     static var defaultPresetCount: Int { defaultPresets.count }
 
+    /// Names of the built-in categories. Used by the category manager to protect
+    /// them — only custom categories can be edited or deleted.
+    static var defaultPresetNames: [String] { defaultPresets.map(\.name) }
+
     /// Ensures exactly one of each default category exists. Safe to call on
     /// every launch.
     ///
