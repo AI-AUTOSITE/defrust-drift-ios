@@ -68,6 +68,10 @@ extension Category {
         CategoryPreset("Other", "#8E8E93", "ellipsis.circle.fill")
     ]
 
+    /// The number of built-in categories seeded on first launch. Exposed so
+    /// tests track the preset list automatically instead of hard-coding a count.
+    static var defaultPresetCount: Int { defaultPresets.count }
+
     /// Ensures exactly one of each default category exists. Safe to call on
     /// every launch.
     ///

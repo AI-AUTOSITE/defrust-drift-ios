@@ -124,16 +124,16 @@ struct DriftSchemaV1Tests {
         #expect(subs.first?.category == nil)
     }
 
-    @Test("Category.seedIfNeeded seeds ten defaults exactly once")
+    @Test("Category.seedIfNeeded seeds the defaults exactly once")
     func seedIsIdempotent() throws {
         let container = try makeContainer()
         let context = container.mainContext
 
         Category.seedIfNeeded(in: context)
-        #expect(try context.fetchCount(FetchDescriptor<Category>()) == 10)
+        #expect(try context.fetchCount(FetchDescriptor<Category>()) == Category.defaultPresetCount)
 
         Category.seedIfNeeded(in: context) // second call is a no-op
-        #expect(try context.fetchCount(FetchDescriptor<Category>()) == 10)
+        #expect(try context.fetchCount(FetchDescriptor<Category>()) == Category.defaultPresetCount)
 
         let bySortOrder = FetchDescriptor<Category>(sortBy: [SortDescriptor(\.sortOrder)])
         let seeded = try context.fetch(bySortOrder)
