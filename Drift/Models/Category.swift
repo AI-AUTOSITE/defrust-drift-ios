@@ -58,6 +58,12 @@ extension Category {
         CategoryPreset("Music", "#FF2D92", "music.note"),
         CategoryPreset("Gaming", "#64D2FF", "gamecontroller.fill"),
         CategoryPreset("E-commerce", "#FFD60A", "cart.fill"),
+        CategoryPreset("Design", "#FF375F", "paintpalette.fill"),
+        CategoryPreset("Education", "#AC8E68", "graduationcap.fill"),
+        CategoryPreset("Finance", "#32ADE6", "dollarsign.circle.fill"),
+        CategoryPreset("Storage", "#5AC8FA", "externaldrive.fill"),
+        CategoryPreset("Food & Drink", "#FF9500", "fork.knife"),
+        CategoryPreset("Transport", "#40C8E0", "car.fill"),
         CategoryPreset("Other", "#8E8E93", "ellipsis.circle.fill")
     ]
 

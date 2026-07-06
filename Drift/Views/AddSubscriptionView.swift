@@ -43,6 +43,7 @@ struct AddSubscriptionView: View {
     @State private var guideStore = CancellationGuideStore()
     @State private var isPickingService = false
     @State private var isShowingPaywall = false
+    @State private var isShowingCategoryEditor = false
 
     /// Bumped on a successful save so the success haptic fires.
     @State private var saveTick = 0
@@ -148,6 +149,11 @@ struct AddSubscriptionView: View {
                                 .tag(Optional(category.persistentModelID))
                         }
                     }
+                    Button {
+                        isShowingCategoryEditor = true
+                    } label: {
+                        Label("New category…", systemImage: "plus.circle")
+                    }
                 }
 
                 Section {
@@ -194,6 +200,12 @@ struct AddSubscriptionView: View {
             .sheet(isPresented: $isShowingPaywall) {
                 PaywallView()
                     .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $isShowingCategoryEditor) {
+                CategoryEditorView { category in
+                    categoryID = category.persistentModelID
+                }
+                .presentationDragIndicator(.visible)
             }
             .driftHaptic(.subscriptionAdded, trigger: saveTick)
             .onAppear(perform: populate)
