@@ -272,9 +272,9 @@ struct AddSubscriptionView: View {
         // Store `nil` for "not sure yet" so the cancel screen knows to ask.
         subscription.billingChannel = billingChannel == .unknown ? nil : billingChannel
 
-        // New subscriptions take their look from the chosen category so the list
-        // reads at a glance; editing leaves an existing icon/color untouched.
-        if existing == nil, let category {
+        // A subscription's icon and color follow its category, so changing the
+        // category (on add or edit) updates the row's look to match.
+        if let category {
             subscription.iconName = category.iconSymbol
             subscription.customColor = category.colorHex
         }
