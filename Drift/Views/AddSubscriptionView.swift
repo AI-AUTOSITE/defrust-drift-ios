@@ -144,7 +144,8 @@ struct AddSubscriptionView: View {
                     Picker("Category", selection: $categoryID) {
                         Text("None").tag(PersistentIdentifier?.none)
                         ForEach(categories) { category in
-                            Text(category.name).tag(Optional(category.persistentModelID))
+                            Label(category.name, systemImage: category.iconSymbol)
+                                .tag(Optional(category.persistentModelID))
                         }
                     }
                 }

@@ -13,6 +13,7 @@
 //  are worth cancelling (see MonthlyReviewView).
 //
 
+import Charts
 import SwiftData
 import SwiftUI
 
@@ -79,6 +80,38 @@ struct OverviewView: View {
             .sorted { $0.nextRenewalDate < $1.nextRenewalDate }
     }
 
+    /// Monthly spend grouped by category (converted to the display currency),
+    /// largest first. Subscriptions without a category fall under "Other".
+    private var spendByCategory: [CategorySpend] {
+        var totals: [String: (amount: Decimal, colorHex: String)] = [:]
+        for subscription in activeSubscriptions {
+            let converted = ExchangeRates.convert(
+                subscription.monthlyCost,
+                from: subscription.currencyCode,
+                to: preferredCurrencyCode
+            )
+            let name = subscription.category?.name ?? "Other"
+            let colorHex = subscription.category?.colorHex ?? "#8E8E93"
+            let running = totals[name]?.amount ?? .zero
+            totals[name] = (amount: running + converted, colorHex: colorHex)
+        }
+        return totals
+            .map { CategorySpend(name: $0.key, amount: $0.value.amount, colorHex: $0.value.colorHex) }
+            .sorted { $0.amount > $1.amount }
+    }
+
+    /// A little headroom past the largest bar so its amount label never clips.
+    private var maxCategorySpend: Double {
+        (spendByCategory.map(\.plottableAmount).max() ?? 1) * 1.3
+    }
+
+    private var categoryChartAccessibilityLabel: String {
+        let parts = spendByCategory.map { item in
+            "\(item.name), \(item.amount.formatted(.currency(code: preferredCurrencyCode))) per month"
+        }
+        return "Spending by category. " + parts.joined(separator: ". ")
+    }
+
     var body: some View {
         NavigationStack {
             Group {
@@ -121,6 +154,9 @@ struct OverviewView: View {
                 reviewCard
                 if !upcomingRenewals.isEmpty {
                     upcomingSection
+                }
+                if spendByCategory.count >= 2 {
+                    byCategorySection
                 }
             }
             .padding(.vertical, DriftSpacing.s24)
@@ -217,6 +253,50 @@ struct OverviewView: View {
             }
         }
     }
+
+    private var byCategorySection: some View {
+        VStack(alignment: .leading, spacing: DriftSpacing.s12) {
+            Text("By category")
+                .font(DriftTypography.sectionTitle)
+                .padding(.horizontal, DriftSpacing.s16)
+                .accessibilityAddTraits(.isHeader)
+
+            Chart(spendByCategory) { item in
+                BarMark(
+                    x: .value("Amount", item.plottableAmount),
+                    y: .value("Category", item.name)
+                )
+                .foregroundStyle(Color.categoryTint(hex: item.colorHex))
+                .cornerRadius(4)
+                .annotation(position: .trailing) {
+                    Text(item.amount, format: .currency(code: preferredCurrencyCode))
+                        .font(DriftTypography.caption)
+                        .foregroundStyle(DriftTheme.subtleText)
+                }
+            }
+            .chartXScale(domain: 0...maxCategorySpend)
+            .chartXAxis(.hidden)
+            .chartLegend(.hidden)
+            .frame(height: CGFloat(spendByCategory.count) * 44)
+            .padding(DriftSpacing.s16)
+            .background(
+                RoundedRectangle(cornerRadius: DriftRadius.l, style: .continuous)
+                    .fill(DriftTheme.neutralFill)
+            )
+            .padding(.horizontal, DriftSpacing.s16)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(categoryChartAccessibilityLabel)
+        }
+    }
+}
+
+private struct CategorySpend: Identifiable {
+    let name: String
+    let amount: Decimal
+    let colorHex: String
+
+    var id: String { name }
+    var plottableAmount: Double { NSDecimalNumber(decimal: amount).doubleValue }
 }
 
 private struct RenewalChip: View {
