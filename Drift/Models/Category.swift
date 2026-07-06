@@ -60,6 +60,7 @@ extension Category {
         CategoryPreset("E-commerce", "#FFD60A", "cart.fill"),
         CategoryPreset("Design", "#FF375F", "paintpalette.fill"),
         CategoryPreset("Education", "#AC8E68", "graduationcap.fill"),
+        CategoryPreset("Health", "#FF6961", "heart.fill"),
         CategoryPreset("Finance", "#32ADE6", "dollarsign.circle.fill"),
         CategoryPreset("Storage", "#5AC8FA", "externaldrive.fill"),
         CategoryPreset("Food & Drink", "#FF9500", "fork.knife"),
