@@ -185,6 +185,54 @@ struct OverviewView: View {
             }
     }
 
+    /// Cumulative money reclaimed (display currency) at an arbitrary date.
+    private func reclaimed(at date: Date, canceled: [Subscription]) -> Double {
+        canceled.reduce(0.0) { partial, sub in
+            guard let canceledDate = sub.canceledDate, date > canceledDate else { return partial }
+            let months = date.timeIntervalSince(canceledDate) / (86_400 * 30.4375)
+            let monthly = ExchangeRates.convert(
+                sub.monthlyCost,
+                from: sub.currencyCode,
+                to: preferredCurrencyCode
+            )
+            return partial + NSDecimalNumber(decimal: monthly).doubleValue * months
+        }
+    }
+
+    /// Real, accumulated reclaimed amount — one point per month from the first
+    /// cancellation to today. Drawn as the solid line + filled area.
+    private var reclaimedActualPoints: [ReclaimedPoint] {
+        let canceled = subscriptions.filter { $0.isCanceled }
+        guard let first = canceled.compactMap(\.canceledDate).min() else { return [] }
+        let cal = Calendar.current
+        let now = Date()
+        var points: [ReclaimedPoint] = []
+        var month = cal.dateInterval(of: .month, for: first)?.start ?? first
+        var guardCount = 0
+        while month < now, guardCount < 60 {
+            points.append(ReclaimedPoint(date: month, amount: reclaimed(at: month, canceled: canceled), isProjected: false))
+            month = cal.date(byAdding: .month, value: 1, to: month) ?? now
+            guardCount += 1
+        }
+        points.append(ReclaimedPoint(date: now, amount: reclaimed(at: now, canceled: canceled), isProjected: false))
+        return points
+    }
+
+    /// Projected trajectory at the current monthly rate, 12 months out. Starts
+    /// at today's point (so it joins the solid line) and is drawn dashed to make
+    /// clear it is an estimate, not money already reclaimed.
+    private var reclaimedProjectedPoints: [ReclaimedPoint] {
+        guard let bridge = reclaimedActualPoints.last else { return [] }
+        let cal = Calendar.current
+        let monthlyRate = NSDecimalNumber(decimal: annualReclaimed).doubleValue / 12.0
+        var points: [ReclaimedPoint] = [bridge]
+        for index in 1...12 {
+            let date = cal.date(byAdding: .month, value: index, to: bridge.date) ?? bridge.date
+            points.append(ReclaimedPoint(date: date, amount: bridge.amount + monthlyRate * Double(index), isProjected: true))
+        }
+        return points
+    }
+
     private var savingsAccessibilityLabel: String {
         let annual = annualReclaimed.formatted(.currency(code: preferredCurrencyCode))
         let soFar = totalReclaimed.formatted(.currency(code: preferredCurrencyCode))
@@ -302,6 +350,57 @@ struct OverviewView: View {
         }
     }
 
+    private var reclaimedChart: some View {
+        Chart {
+            ForEach(reclaimedActualPoints) { point in
+                AreaMark(
+                    x: .value("Month", point.date),
+                    y: .value("Reclaimed", point.amount)
+                )
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [DriftTheme.accent.opacity(0.25), DriftTheme.accent.opacity(0.02)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .interpolationMethod(.monotone)
+
+                LineMark(
+                    x: .value("Month", point.date),
+                    y: .value("Reclaimed", point.amount)
+                )
+                .foregroundStyle(DriftTheme.accent)
+                .interpolationMethod(.monotone)
+            }
+
+            ForEach(reclaimedProjectedPoints) { point in
+                LineMark(
+                    x: .value("Month", point.date),
+                    y: .value("Reclaimed", point.amount)
+                )
+                .foregroundStyle(DriftTheme.accent.opacity(0.55))
+                .lineStyle(StrokeStyle(lineWidth: 2, dash: [4, 4]))
+                .interpolationMethod(.monotone)
+            }
+
+            if let last = reclaimedActualPoints.last {
+                PointMark(
+                    x: .value("Month", last.date),
+                    y: .value("Reclaimed", last.amount)
+                )
+                .foregroundStyle(DriftTheme.accent)
+                .symbolSize(60)
+            }
+        }
+        .chartYAxis(.hidden)
+        .chartXAxis(.hidden)
+        .chartLegend(.hidden)
+        .frame(height: 130)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Money reclaimed over time, rising and projected forward at the current pace.")
+    }
+
     private var savingsSummary: some View {
         VStack(alignment: .leading, spacing: DriftSpacing.s4) {
             Text("Reclaimed")
@@ -315,6 +414,9 @@ struct OverviewView: View {
             Text("by canceling \(canceledCount) \(canceledCount == 1 ? "subscription" : "subscriptions")")
                 .font(.footnote)
                 .foregroundStyle(DriftTheme.subtleText)
+
+            reclaimedChart
+                .padding(.top, DriftSpacing.s8)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(DriftSpacing.s16)
@@ -361,6 +463,14 @@ struct OverviewView: View {
             .accessibilityLabel(categoryChartAccessibilityLabel)
         }
     }
+}
+
+private struct ReclaimedPoint: Identifiable {
+    let date: Date
+    let amount: Double
+    let isProjected: Bool
+
+    var id: Date { date }
 }
 
 private struct CategorySpend: Identifiable {
