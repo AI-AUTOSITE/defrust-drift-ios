@@ -237,22 +237,33 @@ private struct SubscriptionRow: View {
             if !isLarge { amountText }
         }
         .padding(.vertical, DriftSpacing.s4)
-        .opacity(subscription.isPaused ? 0.55 : 1)
+        .opacity(subscription.isPaused || subscription.isCanceled ? 0.55 : 1)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityDescription)
     }
 
     @ViewBuilder
     private var statusLine: some View {
-        if subscription.isPaused {
-            Text("Paused")
-                .font(.footnote)
-                .foregroundStyle(DriftTheme.subtleText)
+        if subscription.isCanceled {
+            statusBadge("Canceled", color: .gray)
+        } else if subscription.isPaused {
+            statusBadge("Paused", color: .orange)
         } else {
             Text("Renews \(subscription.nextRenewalDate.formatted(.dateTime.month().day()))")
                 .font(.footnote)
                 .foregroundStyle(DriftTheme.subtleText)
         }
+    }
+
+    /// A small, calm status pill. Active subscriptions show their renewal date
+    /// instead (no pill), so a pill always means "not currently billing."
+    private func statusBadge(_ text: String, color: Color) -> some View {
+        Text(text)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(color)
+            .padding(.horizontal, DriftSpacing.s8)
+            .padding(.vertical, 2)
+            .background(color.opacity(0.15), in: Capsule())
     }
 
     private var amountText: some View {
@@ -266,9 +277,14 @@ private struct SubscriptionRow: View {
     private var accessibilityDescription: String {
         let cost = subscription.monthlyCost
             .formatted(.currency(code: subscription.currencyCode))
-        let status = subscription.isPaused
-            ? "paused"
-            : "renews \(subscription.nextRenewalDate.formatted(.dateTime.month(.wide).day()))"
+        let status: String
+        if subscription.isCanceled {
+            status = "canceled"
+        } else if subscription.isPaused {
+            status = "paused"
+        } else {
+            status = "renews \(subscription.nextRenewalDate.formatted(.dateTime.month(.wide).day()))"
+        }
         return "\(subscription.name), \(cost) per month, \(status)"
     }
 }
