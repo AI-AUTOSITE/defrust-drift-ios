@@ -368,7 +368,8 @@ struct OverviewView: View {
 
                 LineMark(
                     x: .value("Month", point.date),
-                    y: .value("Reclaimed", point.amount)
+                    y: .value("Reclaimed", point.amount),
+                    series: .value("Series", "actual")
                 )
                 .foregroundStyle(DriftTheme.accent)
                 .interpolationMethod(.monotone)
@@ -377,7 +378,8 @@ struct OverviewView: View {
             ForEach(reclaimedProjectedPoints) { point in
                 LineMark(
                     x: .value("Month", point.date),
-                    y: .value("Reclaimed", point.amount)
+                    y: .value("Reclaimed", point.amount),
+                    series: .value("Series", "projected")
                 )
                 .foregroundStyle(DriftTheme.accent.opacity(0.55))
                 .lineStyle(StrokeStyle(lineWidth: 2, dash: [4, 4]))
