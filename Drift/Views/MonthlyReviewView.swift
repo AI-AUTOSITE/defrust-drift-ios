@@ -47,7 +47,7 @@ struct MonthlyReviewView: View {
     /// handled separately (see `pausedSubscriptions`), because a paused item is
     /// not billing now and should never appear with a savings figure.
     private var reviewable: [Subscription] {
-        subscriptions.filter { !$0.isPaused }
+        subscriptions.filter { !$0.isPaused && !$0.isCanceled }
     }
 
     /// Paused subscriptions get their own honest section ("you paused these,

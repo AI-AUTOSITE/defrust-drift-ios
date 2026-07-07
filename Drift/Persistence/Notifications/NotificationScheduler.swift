@@ -140,7 +140,7 @@ public final class NotificationScheduler: NSObject {
                 subscriptionID: sub.id,
                 subscriptionName: sub.name,
                 renewalDate: sub.nextRenewalDate,    // non-optional Date — used directly (bug #12)
-                isPaused: sub.isPaused,
+                isPaused: sub.isPaused || sub.isCanceled,
                 daysBeforeOptions: enabledDays
             ))
         }

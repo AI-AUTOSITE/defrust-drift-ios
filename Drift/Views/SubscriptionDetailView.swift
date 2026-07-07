@@ -108,6 +108,15 @@ struct SubscriptionDetailView: View {
             }
 
             Section {
+                Button {
+                    toggleCancel()
+                } label: {
+                    Label(subscription.isCanceled ? "Reactivate Subscription" : "Mark as Canceled",
+                          systemImage: subscription.isCanceled ? "arrow.clockwise.circle" : "xmark.circle")
+                }
+            }
+
+            Section {
                 Button(role: .destructive) {
                     onDelete(subscription)
                     dismiss()
@@ -247,6 +256,12 @@ struct SubscriptionDetailView: View {
         WidgetCenter.shared.reloadAllTimelines()
     }
 
+    private func toggleCancel() {
+        subscription.applyCancel(!subscription.isCanceled)
+        try? context.save()
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
     private var header: some View {
         HStack(spacing: DriftSpacing.s16) {
             Image(systemName: subscription.iconName)
@@ -269,6 +284,11 @@ struct SubscriptionDetailView: View {
                     Text("Paused")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.orange)
+                }
+                if subscription.isCanceled {
+                    Text("Canceled")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
                 }
             }
 

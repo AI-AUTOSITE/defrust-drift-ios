@@ -53,6 +53,13 @@ extension DriftSchemaV1 {
         /// "daily" / "weekly" / "monthly" / "rarely" / "never"
         var frequencyTag: String?
 
+        /// Whether the subscription has been canceled. Canceled subscriptions
+        /// leave the active totals and notifications, and feed cumulative savings.
+        var isCanceled: Bool = false
+        /// When the subscription was canceled (set by `applyCancel`). `nil` when
+        /// active. Optional so CloudKit can add it without a heavyweight migration.
+        var canceledDate: Date?
+
         // MARK: - Categorization
         var category: Category?
         var notes: String = ""
@@ -98,6 +105,18 @@ extension DriftSchemaV1 {
             if paused {
                 pausedDate = Date()
             } else {
+                pausedDate = nil
+                pausedUntil = nil
+            }
+        }
+
+        /// Cancel or reactivate the subscription. Canceling stamps `canceledDate`
+        /// and supersedes any pause; reactivating clears `canceledDate`.
+        func applyCancel(_ canceled: Bool) {
+            isCanceled = canceled
+            canceledDate = canceled ? Date() : nil
+            if canceled {
+                isPaused = false
                 pausedDate = nil
                 pausedUntil = nil
             }

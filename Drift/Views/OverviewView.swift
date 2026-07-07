@@ -36,7 +36,7 @@ struct OverviewView: View {
     /// predicate quirks (and the set is tiny).
     private var activeSubscriptions: [Subscription] {
         subscriptions.filter {
-            !$0.isPaused && $0.persistentModelID != deletionState.pendingID
+            !$0.isPaused && !$0.isCanceled && $0.persistentModelID != deletionState.pendingID
         }
     }
 

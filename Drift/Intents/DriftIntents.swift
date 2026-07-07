@@ -11,7 +11,7 @@ struct MonthlySpendIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let context = ModelContext(SharedModelContainer.shared)
-        let descriptor = FetchDescriptor<Subscription>(predicate: #Predicate<Subscription> { !$0.isPaused })
+        let descriptor = FetchDescriptor<Subscription>(predicate: #Predicate<Subscription> { !$0.isPaused && !$0.isCanceled })
         let subs = (try? context.fetch(descriptor)) ?? []
         let totalUSD = subs.reduce(0.0) { $0 + ExchangeRates.toUSD($1.monthlyCost, code: $1.currencyCode) }
         let formatted = totalUSD.formatted(.currency(code: "USD"))

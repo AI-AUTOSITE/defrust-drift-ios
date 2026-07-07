@@ -57,7 +57,7 @@ struct SubscriptionQuery: EntityQuery, EntityStringQuery {
     func suggestedEntities() async throws -> [SubscriptionEntity] {
         let context = ModelContext(SharedModelContainer.shared)
         let descriptor = FetchDescriptor<Subscription>(
-            predicate: #Predicate<Subscription> { !$0.isPaused },
+            predicate: #Predicate<Subscription> { !$0.isPaused && !$0.isCanceled },
             sortBy: [SortDescriptor(\.name)]
         )
         let active = (try? context.fetch(descriptor)) ?? []
