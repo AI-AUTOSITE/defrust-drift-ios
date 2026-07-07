@@ -170,10 +170,26 @@ struct OverviewView: View {
             }
     }
 
+    /// The yearly amount no longer being paid — each canceled subscription's
+    /// monthly cost (in the display currency) times 12. Meaningful the moment
+    /// you cancel, unlike the slowly-accumulating `totalReclaimed`.
+    private var annualReclaimed: Decimal {
+        subscriptions
+            .filter { $0.isCanceled }
+            .reduce(Decimal.zero) { partial, sub in
+                partial + ExchangeRates.convert(
+                    sub.monthlyCost,
+                    from: sub.currencyCode,
+                    to: preferredCurrencyCode
+                ) * 12
+            }
+    }
+
     private var savingsAccessibilityLabel: String {
-        let amount = totalReclaimed.formatted(.currency(code: preferredCurrencyCode))
+        let annual = annualReclaimed.formatted(.currency(code: preferredCurrencyCode))
+        let soFar = totalReclaimed.formatted(.currency(code: preferredCurrencyCode))
         let noun = canceledCount == 1 ? "subscription" : "subscriptions"
-        return "Reclaimed \(amount) since canceling \(canceledCount) \(noun)."
+        return "Reclaimed \(annual) per year by canceling \(canceledCount) \(noun). \(soFar) so far."
     }
 
     private var content: some View {
@@ -290,10 +306,13 @@ struct OverviewView: View {
         VStack(alignment: .leading, spacing: DriftSpacing.s4) {
             Text("Reclaimed")
                 .font(DriftTypography.sectionTitle)
-            Text(totalReclaimed, format: .currency(code: preferredCurrencyCode))
+            Text("\(annualReclaimed.formatted(.currency(code: preferredCurrencyCode))) / year")
                 .font(.title2.weight(.bold))
                 .foregroundStyle(DriftTheme.accent)
-            Text("since you canceled \(canceledCount) \(canceledCount == 1 ? "subscription" : "subscriptions")")
+            Text("\(totalReclaimed.formatted(.currency(code: preferredCurrencyCode))) reclaimed so far")
+                .font(.footnote)
+                .foregroundStyle(DriftTheme.subtleText)
+            Text("by canceling \(canceledCount) \(canceledCount == 1 ? "subscription" : "subscriptions")")
                 .font(.footnote)
                 .foregroundStyle(DriftTheme.subtleText)
         }
