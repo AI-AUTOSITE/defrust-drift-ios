@@ -4,8 +4,9 @@
 //
 //  Lists every category and lets you manage the ones you created. Built-in
 //  categories are shown but protected — only custom categories can be edited
-//  or deleted. Deleting a category never deletes its subscriptions; they just
-//  lose their category (the model's delete rule nullifies the link).
+//  or deleted. Deleting a category never deletes its subscriptions; they lose
+//  their category and fall back to the neutral "no category" look. If a custom
+//  category is in use, deleting it asks for confirmation first.
 //
 
 import SwiftData
@@ -17,15 +18,23 @@ struct CategoryManagerView: View {
 
     @State private var editingCategory: Category?
     @State private var isCreating = false
+    @State private var pendingDelete: Category?
 
     var body: some View {
         List {
             Section {
                 ForEach(categories) { category in
                     row(for: category)
-                        .deleteDisabled(isBuiltIn(category))
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            if !isBuiltIn(category) {
+                                Button(role: .destructive) {
+                                    requestDelete(category)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                        }
                 }
-                .onDelete(perform: deleteCustom)
             } footer: {
                 Text("Built-in categories can't be changed. Tap a custom category to edit it, or swipe to delete — its subscriptions stay and simply lose their category.")
             }
@@ -48,6 +57,19 @@ struct CategoryManagerView: View {
         .sheet(isPresented: $isCreating) {
             CategoryEditorView()
                 .presentationDragIndicator(.visible)
+        }
+        .alert(
+            "Delete category?",
+            isPresented: Binding(
+                get: { pendingDelete != nil },
+                set: { if !$0 { pendingDelete = nil } }
+            ),
+            presenting: pendingDelete
+        ) { category in
+            Button("Delete", role: .destructive) { performDelete(category) }
+            Button("Cancel", role: .cancel) {}
+        } message: { category in
+            Text(deleteMessage(for: category))
         }
     }
 
@@ -84,13 +106,33 @@ struct CategoryManagerView: View {
         Category.defaultPresetNames.contains(category.name)
     }
 
-    private func deleteCustom(at offsets: IndexSet) {
-        for index in offsets {
-            let category = categories[index]
-            if !isBuiltIn(category) {
-                context.delete(category)
-            }
+    private func inUseCount(_ category: Category) -> Int {
+        category.subscriptions?.count ?? 0
+    }
+
+    private func deleteMessage(for category: Category) -> String {
+        let count = inUseCount(category)
+        let noun = count == 1 ? "subscription" : "subscriptions"
+        return "\"\(category.name)\" is used by \(count) \(noun). They'll keep working but lose their category."
+    }
+
+    private func requestDelete(_ category: Category) {
+        if inUseCount(category) == 0 {
+            performDelete(category)
+        } else {
+            pendingDelete = category
         }
+    }
+
+    private func performDelete(_ category: Category) {
+        // Reset any subscriptions using this category to the neutral look
+        // before removing it, so no stale icon or color is left behind.
+        for subscription in category.subscriptions ?? [] {
+            subscription.iconName = "creditcard.fill"
+            subscription.customColor = "#5E5CE6"
+        }
+        context.delete(category)
         try? context.save()
+        pendingDelete = nil
     }
 }

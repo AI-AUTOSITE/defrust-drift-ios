@@ -43,7 +43,7 @@ struct AddSubscriptionView: View {
     @State private var guideStore = CancellationGuideStore()
     @State private var isPickingService = false
     @State private var isShowingPaywall = false
-    @State private var isShowingCategoryEditor = false
+    @State private var isShowingCategoryManager = false
 
     /// Bumped on a successful save so the success haptic fires.
     @State private var saveTick = 0
@@ -150,9 +150,9 @@ struct AddSubscriptionView: View {
                         }
                     }
                     Button {
-                        isShowingCategoryEditor = true
+                        isShowingCategoryManager = true
                     } label: {
-                        Label("New category…", systemImage: "plus.circle")
+                        Label("Manage categories", systemImage: "square.grid.2x2")
                     }
                 }
 
@@ -201,9 +201,14 @@ struct AddSubscriptionView: View {
                 PaywallView()
                     .presentationDragIndicator(.visible)
             }
-            .sheet(isPresented: $isShowingCategoryEditor) {
-                CategoryEditorView { category in
-                    categoryID = category.persistentModelID
+            .sheet(isPresented: $isShowingCategoryManager) {
+                NavigationStack {
+                    CategoryManagerView()
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Done") { isShowingCategoryManager = false }
+                            }
+                        }
                 }
                 .presentationDragIndicator(.visible)
             }
@@ -286,10 +291,14 @@ struct AddSubscriptionView: View {
         subscription.billingChannel = billingChannel == .unknown ? nil : billingChannel
 
         // A subscription's icon and color follow its category, so changing the
-        // category (on add or edit) updates the row's look to match.
+        // category (on add or edit) updates the row's look to match. Clearing
+        // the category resets it to the neutral "no category" look.
         if let category {
             subscription.iconName = category.iconSymbol
             subscription.customColor = category.colorHex
+        } else {
+            subscription.iconName = "creditcard.fill"
+            subscription.customColor = "#5E5CE6"
         }
 
         if existing == nil {
