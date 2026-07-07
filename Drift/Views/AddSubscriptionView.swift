@@ -44,6 +44,7 @@ struct AddSubscriptionView: View {
     @State private var isPickingService = false
     @State private var isShowingPaywall = false
     @State private var isShowingCategoryManager = false
+    @State private var isShowingCategoryPicker = false
 
     /// Bumped on a successful save so the success haptic fires.
     @State private var saveTick = 0
@@ -77,6 +78,26 @@ struct AddSubscriptionView: View {
     }
 
     /// Display name of the currently linked service, if any.
+    private var selectedCategory: Category? {
+        guard let categoryID else { return nil }
+        return categories.first { $0.persistentModelID == categoryID }
+    }
+
+    @ViewBuilder
+    private var selectedCategoryLabel: some View {
+        if let category = selectedCategory {
+            HStack(spacing: DriftSpacing.s8) {
+                Image(systemName: category.iconSymbol)
+                    .foregroundStyle(Color.categoryTint(hex: category.colorHex))
+                Text(category.name)
+                    .foregroundStyle(DriftTheme.subtleText)
+            }
+        } else {
+            Text("None")
+                .foregroundStyle(DriftTheme.subtleText)
+        }
+    }
+
     private var linkedServiceName: String? {
         guard let serviceID else { return nil }
         return guideStore.guide(for: serviceID)?.serviceName
@@ -142,13 +163,19 @@ struct AddSubscriptionView: View {
                 }
 
                 Section("Category") {
-                    Picker("Category", selection: $categoryID) {
-                        Text("None").tag(PersistentIdentifier?.none)
-                        ForEach(categories) { category in
-                            Label(category.name, systemImage: category.iconSymbol)
-                                .tag(Optional(category.persistentModelID))
+                    Button {
+                        isShowingCategoryPicker = true
+                    } label: {
+                        HStack {
+                            Text("Category")
+                            Spacer()
+                            selectedCategoryLabel
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.tertiary)
                         }
                     }
+                    .buttonStyle(.plain)
                     Button {
                         isShowingCategoryManager = true
                     } label: {
@@ -211,6 +238,10 @@ struct AddSubscriptionView: View {
                         }
                 }
                 .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $isShowingCategoryPicker) {
+                CategoryPickerView(selection: $categoryID)
+                    .presentationDragIndicator(.visible)
             }
             .driftHaptic(.subscriptionAdded, trigger: saveTick)
             .onAppear(perform: populate)
