@@ -147,10 +147,42 @@ struct OverviewView: View {
         }
     }
 
+    private var canceledCount: Int {
+        subscriptions.filter { $0.isCanceled }.count
+    }
+
+    /// Cumulative money reclaimed by canceling subscriptions: each canceled
+    /// subscription's monthly cost (in the display currency) times how many
+    /// months have passed since it was canceled. Grows over time.
+    private var totalReclaimed: Decimal {
+        let now = Date()
+        return subscriptions
+            .filter { $0.isCanceled }
+            .reduce(Decimal.zero) { partial, sub in
+                guard let canceledDate = sub.canceledDate, now > canceledDate else { return partial }
+                let months = Decimal(now.timeIntervalSince(canceledDate) / (86_400 * 30.4375))
+                let monthly = ExchangeRates.convert(
+                    sub.monthlyCost,
+                    from: sub.currencyCode,
+                    to: preferredCurrencyCode
+                )
+                return partial + monthly * months
+            }
+    }
+
+    private var savingsAccessibilityLabel: String {
+        let amount = totalReclaimed.formatted(.currency(code: preferredCurrencyCode))
+        let noun = canceledCount == 1 ? "subscription" : "subscriptions"
+        return "Reclaimed \(amount) since canceling \(canceledCount) \(noun)."
+    }
+
     private var content: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DriftSpacing.s32) {
                 hero
+                if canceledCount > 0 {
+                    savingsSummary
+                }
                 reviewCard
                 if !upcomingRenewals.isEmpty {
                     upcomingSection
@@ -252,6 +284,28 @@ struct OverviewView: View {
                 .padding(.horizontal, DriftSpacing.s16)
             }
         }
+    }
+
+    private var savingsSummary: some View {
+        VStack(alignment: .leading, spacing: DriftSpacing.s4) {
+            Text("Reclaimed")
+                .font(DriftTypography.sectionTitle)
+            Text(totalReclaimed, format: .currency(code: preferredCurrencyCode))
+                .font(.title2.weight(.bold))
+                .foregroundStyle(DriftTheme.accent)
+            Text("since you canceled \(canceledCount) \(canceledCount == 1 ? "subscription" : "subscriptions")")
+                .font(.footnote)
+                .foregroundStyle(DriftTheme.subtleText)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(DriftSpacing.s16)
+        .background(
+            RoundedRectangle(cornerRadius: DriftRadius.l, style: .continuous)
+                .fill(DriftTheme.neutralFill)
+        )
+        .padding(.horizontal, DriftSpacing.s16)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(savingsAccessibilityLabel)
     }
 
     private var byCategorySection: some View {
