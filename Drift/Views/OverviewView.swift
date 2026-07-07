@@ -29,6 +29,7 @@ struct OverviewView: View {
 
     @State private var isShowingSettings = false
     @State private var isShowingReview = false
+    @State private var projectionMonths = 3
 
     /// Paused subscriptions are excluded, as is any subscription currently in
     /// its swipe-delete undo window (so the total drops immediately, then comes
@@ -226,7 +227,7 @@ struct OverviewView: View {
         let cal = Calendar.current
         let monthlyRate = NSDecimalNumber(decimal: annualReclaimed).doubleValue / 12.0
         var points: [ReclaimedPoint] = [bridge]
-        for index in 1...12 {
+        for index in 1...projectionMonths {
             let date = cal.date(byAdding: .month, value: index, to: bridge.date) ?? bridge.date
             points.append(ReclaimedPoint(date: date, amount: bridge.amount + monthlyRate * Double(index), isProjected: true))
         }
@@ -350,6 +351,10 @@ struct OverviewView: View {
         }
     }
 
+    /// Projection lengths (months) offered under the reclaimed chart. An array
+    /// so the options are easy to change without touching the picker.
+    private static let projectionOptions = [1, 3, 6, 12]
+
     private var reclaimedChart: some View {
         Chart {
             ForEach(reclaimedActualPoints) { point in
@@ -419,6 +424,15 @@ struct OverviewView: View {
 
             reclaimedChart
                 .padding(.top, DriftSpacing.s8)
+
+            Picker("Projection", selection: $projectionMonths) {
+                ForEach(Self.projectionOptions, id: \.self) { months in
+                    Text("\(months)M").tag(months)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.top, DriftSpacing.s8)
+            .accessibilityLabel("Projection length")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(DriftSpacing.s16)
