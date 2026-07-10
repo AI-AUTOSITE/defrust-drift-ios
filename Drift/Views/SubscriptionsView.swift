@@ -21,7 +21,6 @@ struct SubscriptionsView: View {
     @Environment(DeletionState.self) private var deletionState
     @Environment(DriftStore.self) private var store
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Query(sort: \Subscription.name)
     private var subscriptions: [Subscription]
 
@@ -137,17 +136,18 @@ struct SubscriptionsView: View {
                 Spacer(minLength: DriftSpacing.s8)
                 Button("Undo") { undoDelete() }
                     .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(DriftTheme.accent)
             }
             .padding(.horizontal, DriftSpacing.s16)
             .padding(.vertical, DriftSpacing.s12)
+            .foregroundStyle(Color(uiColor: .systemBackground))
             .background(
-                // Reduce Transparency swaps the frosted material for an opaque
-                // surface so the banner stays readable without translucency.
-                reduceTransparency
-                    ? AnyShapeStyle(Color(uiColor: .secondarySystemGroupedBackground))
-                    : AnyShapeStyle(.regularMaterial),
+                // Opaque, self-inverting surface (dark on light content, light on
+                // dark) so the banner always stands out from the list behind it.
+                Color(uiColor: .label),
                 in: RoundedRectangle(cornerRadius: 14, style: .continuous)
             )
+            .shadow(color: .black.opacity(0.18), radius: 12, y: 4)
             .padding(.horizontal, DriftSpacing.s16)
             .padding(.bottom, DriftSpacing.s8)
             // Reduce Motion drops the slide-up and just cross-fades.

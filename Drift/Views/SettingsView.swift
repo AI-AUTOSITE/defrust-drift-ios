@@ -38,6 +38,7 @@ struct SettingsView: View {
             Form {
                 displaySection
                 categoriesSection
+                privacySection
                 proSection
                 aboutSection
                 #if DEBUG
@@ -84,6 +85,16 @@ struct SettingsView: View {
                 CategoryManagerView()
             } label: {
                 Label("Manage categories", systemImage: "square.grid.2x2")
+            }
+        }
+    }
+
+    private var privacySection: some View {
+        Section {
+            NavigationLink {
+                PrivacyView()
+            } label: {
+                Label("Privacy", systemImage: "hand.raised.fill")
             }
         }
     }

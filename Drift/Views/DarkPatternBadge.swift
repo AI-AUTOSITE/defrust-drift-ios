@@ -42,10 +42,10 @@ struct DarkPatternBadge: View {
         // than the screen and clip, so there we let the label wrap to two lines.
         .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
         .fixedSize(horizontal: !dynamicTypeSize.isAccessibilitySize, vertical: false)
-        .foregroundStyle(.white)
+        .foregroundStyle(DriftTheme.darkPatternColor(score: score))
         .padding(.horizontal, DriftSpacing.s8)
         .padding(.vertical, DriftSpacing.s4)
-        .background(Capsule().fill(DriftTheme.darkPatternColor(score: score)))
+        .background(DriftTheme.darkPatternColor(score: score).opacity(0.18), in: Capsule())
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Cancellation difficulty \(score) out of 10. \(label).")
     }
